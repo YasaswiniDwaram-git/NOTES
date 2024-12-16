@@ -1,0 +1,127 @@
+Connect to ec2 instance using Gitbash
+
+linux commands lesson 2
+-------------------------
+
+echo <any text> --> to print "any text"
+
+uname --> to know kernel 
+uname -a (to know more info) 
+uname --help
+
+so , in linux -(a,s,d,e,r,w,t,y,i) but --(name,char,help) two dash for words and one dash for alphabet
+
+copy files syntax
+cp <source file or source file path> <destination file> (bit confused ??revisit)
+
+cut file (same command as rename)(see session 2)
+mv <filename> <to directory where you want to move>
+
+grep <word to find> <filename> --> to find a word in file
+grep -i <word to find (can be case insensitive)> <filename>
+
+download files from URL --
+
+curl and wget
+
+wget <URL> --> wget (is web get ,to download file using URL)
+
+curl <URL> --> curl will not download but to shows the text directly on terminal (usually used to run scripts )
+
+piping command symbol is "|" , out put of first command can be used as input of second command using piping
+
+cut command (see in chatgpt for better understanding on cut and awk) (Simple and straightforward for basic column extraction.)
+ 
+cut -d '<,></><any delimiter>' ( d- delimiter means symbols)
+cut -c 1-5 (take characters from 1-5) or cut -c 2 (take character on '2')
+cut -d '/'  f1,4  (This 'f' option specifies which fields (or columns) to extract after seperating using '/' (f1 means first field , f1.4 means 1 to 4 fileds)) 
+
+awk command (Can perform complex operations such as calculations, conditional logic, and formatting, in addition to extracting data.)
+
+awk -F '/' '{print $NF}' (prints by seperating Nth fragment using '/')
+
+to print 1st fragment seperated by : , use awk -F ':' '{print $1F}' 
+
+interview question - how to get list of users in liux server ..use --> awk -F ':' '{print $1F}' <users file>
+
+head and tail commands syntax
+
+head <filename> --> shows first 10 lines of context
+tail<filename> --> shows second 10 lines of context
+
+there is context of 10 lines , you need 5 lines from 5-10 , how ?
+
+cat <filename> | head -n 10 |tail -n 5 (this takes first 10 and from that it will take last five )
+
+tail -f <log-file> --> how to see running log (will be discussed in usr mgmnt)
+
+if you need other than 10 lines then command is head -n 22 <filename> (here 22 is number of lines wanted)
+
+wc -l -->word count in number of lines usage should be (cat <filename> | wc -l)
+to get number of char wc -c (use wc --help for more)
+
+Editor
+------------------------------------
+vim --> visually improved 
+colon , insert , escape modes
+
+change modes using below
+
+command to esc = esc
+esc to command = :
+
+insert to esc = :
+esc to insert = esc
+
+to start editing give vim <file name>
+press i (insert mode)
+press escape (colon/command mode)
+
+
+press i to start editing once done , if you want to save change and exit
+command mode entered
+
+press esc and then :wq
+to quit without saving after editing esc and :q!
+to quit without editing esc and :q
+
+:set nu  --> to give s.no on lines (can be done after entering to esc only)
+:sent nonu --> to remove s.no
+:/<word to find> --> finds the word from top
+:?<word to find> --> finds word from bottom
+:noh --> no highlight
+:%d --> to delete everything
+:s/<word getting replaced>/<word replacing>--> substitute/replace a word (##replaces word only where the cursor is)
+:s/<word getting replaced>/<word replacing>/g (##effective to whole line where cursor is places)
+:ns/<word getting replaced>/<word replacing>/g (effctive to nth line)
+:%s/<word getting replaced>/<word replacing>/g (effectivce to whole file)
+:11d (deletes 11th line)
+u-->undo
+shift + G -->got to bottom line
+gg--> got to top line
+yy-->copy line
+p-->paste line
+10p --> pastes 10 times
+dd-->deletes a line 
+
+permissions
+------------------------
+'-' is for files 
+
+-rw-r--r--
+
+rw- owner of the group - u
+r-- the grp in which owner belongs -g
+r-- others -o
+
+read -->4
+write -->2
+xecute -->1
+
+if user is not assigned to any grp then grp name is also the user name
+
+chmod ugo+rwx <filename>(gives all access to all user , grp members and others)
+
+chmod u+r-w 
+
+chmod 742 <filename> ( user has (4+2+1) , group has (4 i.e., read) , others have (2 , write)

@@ -1,0 +1,108 @@
+variables
+data types
+conditions
+functions
+shell scripting commands
+Variable
+-----------------------------
+variable=$(command)  ----> output of command is stored as variable here
+
+in vscode , date is a command which shows date
+
+to execute that command by assiging it to a variable 
+
+DATE=$(date +%F)
+echo "Today's date is $DATE"
+
+here after git pull while running command sh , we give values ..so it will run
+
+special variables ###(imp for interviews)
+----------------
+1. All variables to be passed to the script then - $@
+2. how many variables passed in the script - $#
+3.To know current working directorty $PWD
+4.To know currnet user home directory $HOME
+5. To know process id of current command $$
+6. to know PID of last BG command $!
+
+conditions
+---------------
+if ,else , ifelse , while , for  ##check syntax for ss in chrome
+
+writing it for if else and if else
+
+today=what is today
+
+if (today != "Sat" or "Sun")
+{
+print "attend session"
+}
+if (today == "Mon" or "Tues" or "Fri" or "Wed" or "Thur")
+{
+print "attend the class"
+}
+
+else 
+{
+print "no class"
+}
+below is the actual syntax for if condition,
+
+if [ condition ] (put space for before the closing brack and after the opening bracket)
+then
+   statement1
+else
+   statement2
+fi
+
+task1.
+------------
+
+install mysql through shell script
+
+our algorithm-
+
+check if user has root access or not --> user id is 0 for root user , so USERID=$(id -u)
+if they have , proceed with script
+if no root access to user , give error
+check if app already installed , if yes tell user already there
+if not installed , install
+check if successful , if yes ..show successful
+if error , show where error occured
+stop running script , clear error and run again
+
+disadvantage in ss is - it won't stop even at error..
+so , we have to check if it's success or not and hence
+
+$? ---> it shows previous command is success or not
+if it results -'0' then success
+if 1-127 , then failure
+to stop process at failure , we use exit command
+
+functions
+--------------------
+some work to do
+
+		work done
+input --------------> out put (that's what functions do)
+
+for it do , we define a function first and then call it
+
+functions used to decrease lines in code by calling them (to decrease script size)
+
+if you are using same conditions or loops again and again , just define them in function and call the function wherever needed
+
+Colors
+----------
+To print output in colour
+
+linux has codes for colours
+
+31m - red
+32m - green
+33m - yellow  
+
+echo -e "\e[31m Hell" "\e[32m"World" (here hell in red and world in green are printed)
+
+-e is mandatory to enable colors
+

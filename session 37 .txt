@@ -1,0 +1,69 @@
+session 37
+---------
+1.First create an ec2 instance 
+2.configure using Ansible -->
+3.Stop server
+4.take AMI --> we have a server AMI with new version 
+5.delete the instance that was created
+6.create launch template by giving --> ami,network, sg etc
+7.create target group
+8.create ASG(auto scaling group) using launch template and place them in TG
+9.create rule in Load balancer
+
+1.First create an ec2 instance for backend --> this should have port 22,8080 open from vpn
+2.configure using Ansible  
+	Create ansible server and make connection to backend server from it
+	Ansible should connect to it 
+	install ansible , pull playbooks , run locally ----> we are following pull architecture here
+	
+terraform --> shell --> ansible (tf using shell files , shell using ansible files )
+
+We use null resource (usually no resource is created but can be used to have provisioners on chatgpt/google )includes-
+ triggers --> when the instance is created this null resource will be triggered 
+ connection block --> this will have instance details to connect using ssh
+ provisioner "file" --> this will have a file saved which has shell script(ansible install ,anisble-pull) ot fetch data from ansible git repo which was
+	created using ansible roles that has expense project configuration (we make few changes to config,we run only backend script)so , we have main.yaml(to have vars env-dev and component-backend), changes in backend vars will have rds password as mysql_root_password ...
+This will not create a new instance , if ran multiple times until there is a change in instance id
+provisioner "remote-exec" --> to run the shell script file 
+3.Stop server
+	resource "aws_ec2_instance_state" --> syntax has state = stopped (to stop instance),depends on null_resource that was created on step2
+4.take AMI --> we have a server AMI with new version
+	resource "aws_ami_from_instance" --> to take ami from stopped server , depends on resource "aws_ec2_instance_state"
+5.delete the instance that was created -->
+	since terraform has no resource to terminate an instance , we use null and local-exec provisioner(since performing on local) and command = "aws ec2 terminate-instances --instance-ids ${module.backend.id}" 
+	"null_resource" "backend_delete" , depends on resource "aws_ami_from_instance"
+---------------------------------------------------------------------------------------------
+mini steps in between
+
+step2.where you create a copy of ansible folder and want to push it to git
+after copying .git contains the source from where currnt file is copied , so remove .git 
+
+To make folder as git repo - use git init
+--------------------------------------------
+
+This makes the folder as master , now do git branch -M main
+
+all done pushin ansible repor to git and ....
+
+step2.if terraform shows declared config is similar to actual config 
+now run backend folder on terraform..., since null_resource does not create any resource sometimes terraform will say the declared config is similar to actual config (since provisioner run only when instance is being created) and wil not create it 
+
+in that case , we TAINT the null resource for terraform to identify and replace it checking the declared config
+
+terraform taint null_resource.backend  
+
+
+In interviews ## we can say we have few VM based apps and few container based , if it's VM based Ansible is only option to configure the server , Ansible mostly for config ,
+
+To destroy all in one folder from last to first 
+------------------------------------------------
+for i in $(ls -dr */) ; do echo ${i%/}; cd  ${i%/} ; terraform destroy -auto-approve ; cd .. ; done
+
+To create all in one folder from first to last
+-----------------------------------------------
+for i in $(ls -d */) ; do echo ${i%/}; cd  ${i%/} ; terraform apply -auto-approve ; cd .. ; done
+
+To 
+----------------------------------------------
+for i in 10-vpc 20-sg 30-bastion 40-rds 50-app-alb 52-vpn; do cd $i ; terraform apply -auto-approve ; cd .. ; done
+

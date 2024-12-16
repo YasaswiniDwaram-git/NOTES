@@ -1,0 +1,94 @@
+session -39 
+
+
+
+create ec2 instance
+configure with ansible to have backend config in it
+stop instance
+take ami for the instance
+delete the instance
+create a target group
+create a launch template for autoscaling grp
+create autoscaling group and also a policy
+
+for i in 10-vpc 20-sg 40-rds 50-app-alb 52-vpn; do cd $i ; terraform apply -auto-approve ; cd .. ; done
+
+Now --- create ALB listener rule (since listener already created in 50-app-alb)
+
+R53 record --> ALB --> listener --> target group --> Health check(in ALB)---> instance
+
+Avoid -target anytime 
+
+--create ALB listener rule (since listener already created in 50-app-alb , so export it from there only)--
+	we need LB arn , so export to ssm parameter app_alb_lb_listener ,value = aws_lb_listener.http.arn 
+	and then fetch , plan and apply to use it in 60-backend after having it in data file
+-listener_arn
+-priority = #low will be evaluated first
+-action {}
+-condition {host-header {values = backend.app-dev.yashd.icu }}can use vars such as env,comp,zone_name
+
+Connect to VPN and then go to backend to execute the whole script
+
+check load balancer is running or not by bfeiufsmthng.app-dev.yashd.icu 
+
+Auto scaling grp must be informed on where the instance have to be placed ,
+-- so target_group_arns = [lb_taregtgrp.backend]
+-- instance_refresh {strategy = "Rolling"}
+(these were missed ,Check once)
+Rolling update (from session 38)
+----------------
+let's say we have 4 instances and have an application update to be configured in it
+
+1.usually -if any new update is present in app, instances running are stopped and then application is updated using ansible which will cause down time, hence
+2.what Rolling does is , create a new instance with latest version , once instance is up ,it deletes on instance adn then same way it creates one more and deletes one more until 4 new instances are created
+
+instance_refresh {
+strategy = "Rolling"
+preferences{min_healthy_percentage = 50} #this means out of four we need min 2 healthy instance at any point of time
+}
+triggers = ["launch_template"] #since if any change in launch template means , version updated and we need new version instances
+
+Done with mysqlrds,app_alb load balancers, backend server,now ---
+
+,70-acm ,80-web-alb and all within it , 90-frontend server 
+
+we use https for frontend load balancer , which require https certificate for our domain like https://backend.yashd.icu
+https/SSL/TLS certificates will be given by certificate provider for our DNS
+after checking auth of the domain which requires us to create records in our domain for them to validate only then they will give the certificate
+
+in AWS , we have amazon certificate manager ..
+----------------------
+
+since we have yashd.icu , we can take certificate for *.yashd.icu ...
+here expense-dev.yashd.icu is going to be the url to user for accessing our frontend application , so that can also be added...
+
+create certificates for expense-dev.yashd.icu & *.yashd.icu and request , once after requesting you can create records for these 2 in acm itself and 2 random records are created in r53 to validate domain and then certificate will be issued
+
+We do it through terraform now 70-acm
+----------------------------------
+
+resource "aws_acm_certificate" "expense"
+	-domain_name
+	-validation_method
+	-tags(local.resource_name)
+We now create the route53 records for aws to validate and issue our request
+------------------------------------
+resource "aws_route53_record" "expense" #this resource syntax can also be found under above resource page, modify values
+resource "aws_acm_certificate_validation" #modify values accordingly
+	-certification_arn
+	-validation_record_fqdns
+	
+Once after certificates are created , we need to export certificate arn (by storing in aws ssm parameter) and use it from data
+
+80-web-alb 
+----------
+Create SG and SG rules for 
+create web_alb_sg , push sg_id to aws ssm parameter store
+web_alb_sg rules 
+-web_alb from public on port 443(https)
+-web_alb from public on port 80 (http)
+
+Copy 50-app-alb and move to 80-web-alb and modify all accordingly add https listener and give certificate arn
+
+ENSURE THAT YOU HAVE PORT 80 ENABLED ON BOTH ALBs from VPN
+always connect to the damn VPN

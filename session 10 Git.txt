@@ -1,0 +1,192 @@
+Shell scripting
+----------------------------
+drawbacks - not secure if stored locally
+			collaboration issue , not everybody can access it
+			
+Hence , we use Git - is a decentralized source code management
+
+centralized vs decentralized
+---------------------------------
+centralized
+There is a single central repository that stores the main codebase.
+All team members work by connecting to this central server to commit or retrieve code
+easier to manage as all updates or single location
+
+decentralized, 
+team member has a full copy of the entire repository, including all files and the complete history, stored locally.
+ can be more complex to manage because changes are distributed across multiple repositories, and synchronization requires coordination
+ 
+ repositories == is smthng that stores
+Git by linus Torvalds is who invented linux
+ 
+ few integration of Git --> Github,GitOps,Bitbucket,GitLab,Codecommit
+ 
+so , we'll first clone a repo
+
+so,create a public repo and clone it in laptop using gitbash
+
+create an ec2 server and connect it to laptop using keypair 
+
+task1.
+-----------
+Open Gitbash
+
+cd /DevOpsGit
+
+and git clone https://github.com/YasaswiniDwaram-git/Gitrepo.git  
+
+#difference betweem normal folder and Git repo it has '(main)' at the end of it's name
+
+we will develop script in this folder
+
+IDE--> intergrated development enivronment , so download VScode
+
+script ready in vscode is pushed to --> staging area and then to --> local repo(in your PC) and then to --> remote repo(to Git)
+
+when code in vscode it's called --workspace
+when code in staging --> adding
+when code in local repo / remote repo --> commit
+
+to push from workspace to staging
+cd to the main branch
+git add <filename> --> to push from workspace to staging
+git status --> to check stage of script/file
+
+git rm --cached <filename> --> to move from staging to workspace 
+
+git commit -m "any messages TO CONFIRM COMMIT"
+
+git config user.name "Yasaswini"
+git config user.email "yasaswinidwaram07@gmail.com"   ##this means you are adding changes as this user name and email to the code
+
+before doing git add <filename> , do not forget to save
+
+git push origin main --> to push code from staging to repo ## it asks for token to which git account you want to push this 
+
+so to get token , Go to Git account , settings  , developer settings and generate tokens(classic) , check just for repo
+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
+
+shell --> shell is an interpreter that executes the commands
+
+starts with command 
+
+#!/bin/bash (shebang)--> this is first line in shell script , which interprets and executes commands inside the script
+
+echo "hell worlduu"
+
+since change is not done in staging , you again have to do 
+
+git add hellworld.sh , git commit -m "why code commit happened" , git push origin main
+
+you will see changes in your git profile too
+
+task2.
+--------------
+Now run shell scripting code from Git on a linux server
+
+git clone https://github.com/YasaswiniDwaram-git/Gitrepo.git
+
+cd Gitrepo
+
+sh <filename>
+bash <filename>
+./<filename> --> using this command requires execution permission on script file , so chmod u+x 
+
+now add one more sh file and push to git which we will run on linux server
+
+first time using git clone downloads entire repo
+ if any changes , we just do git pull
+ 
+ so , in linux server - 'git pull'
+ 
+ DRY - don't repeat yourself
+--------------------------------------------------------------------------------------1. inside the script
+centralized place --> variables can be updated in whole script by replacing values at person1= , and person2=
+#!/bin/bash
+person1=chinnu
+person2=bobby
+
+echo "Two ppl talking"
+echo "Hi $person1"
+echo "Hi $person2"
+echo " how you doing $person1"
+echo "not bad $person2, you?"
+
+to add , commit and push evrything  , use
+
+git add . ; git commit -m "variables" ; git push origin main
+
+main concepts in programming is below ,(we just need scripting which does not need DB, system resources or super perfomance)
+
+variables
+data types
+conditions
+loops
+functions
+
+but developers code need 
+	perfomance --> high, should load fast
+	DB --> must fetch the data fast
+	memory and system resources --> should consume less
+	
+VARIABLES
+------------
+VAR_NAME=VALUE (no space should be there)
+
+if you don't want to disturb code everytime and need output in desired variables like below (varfile.sh)
+------------------------------------------------------------------------2. pass from outside through args
+person1=$1
+person2=$2
+
+echo "Two ppl talking"
+echo "Hi $person1"
+echo "Hi $person2"
+echo " how you doing $person1"
+echo "not bad $person2, you?"
+
+assign $1 and $2 ,and now push
+after pulling to execute script if you give varfile.sh it gives
+
+Two ppl talking
+Hi
+Hi
+ how you doing
+not bad , you?
+
+if you give bash newvar.sh chinu bobby it gives
+
+Two ppl talking
+Hi chinu
+Hi bobby
+ how you doing chinu
+not bad bobby, you?
+
+the above is called arguments , arguments/args/inputs
+--------------------------------------------------------------3. Enter at runtime
+History of script can easily be viewed using command -- 'history'
+some time , you need data to be hidden such as for username , password
+
+
+echo "please enter your username:"
+
+read username #takes input for username
+
+echo "username entered is $username" #$username is stores username from input
+
+echo "please enter your password"
+
+read -s password #-s hides the password even if $password is used on next commands
+
+echo "password is entered for $username" 
+
+we do 
+1. inside the script
+2. pass from outside through args
+3. Enter at runtime
+
+DATA TYPES
+-----------------
+int,float,decimal,long,string,array
+
+df --> to know m
+

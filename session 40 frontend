@@ -1,0 +1,62 @@
+Done until creating web-alb
+
+Now we need to create frontend server
+
+R53--> APP-ALB --> listener(80,443) -->Rule (host based routing) --> TG --> instance
+
+Now , configure frontend
+-----------------------
+same as backend but changes in variables , provider,main (replace backend with frontend one by one),locals 
+
+usually while creating TG , the path="/health" will be for APIs in applications(backend servers), so
+
+we don't have that and just "/" , also port is 80 for frontend
+
+the listener rule for fronted should have a condition{host_header} for expense-dev.yashd.icu
+
+#504 gateway time out error means , request is not being forwarded to server
+
+SG - we are connecting to frontend (to configure ansible )from private IP, so frontend_vpn is required on port 22
+	- frontend from web_alb on port 80
+	-app_alb from frontend on port 80
+
+in frontend-sh , we need to check
+-main.yaml
+-roles>frontend>tasks(main.yaml)
+-common>tasks>app-pre-req
+-vars>BACKEND_HOST will be changes to backend load balancer API url backend.app-dev.yashd.icu
+-fronted>templates>expense.conf , 8080 can be replaced by 80 or can be removed 
+
+Once done with changes push this to git and the init,plan,apply
+
+$#in AWS parameter store if required to store a password , use securestring as type instead of string ..but if you want to store via terraform , the password will be present in script as well
+
+Domains
+--------
+yashd.icu
+
+backend.app-dev.yashd.icu -->APP ALB
+expense-dev.yashd.icu -->WEB ALB
+mysql-dev.yashd.icu --> Database
+
+New topic (clear about it by next session)
+-----------------------------
+caching --> when a user request for some content in google , ISP caching server will check its cache , 
+if there , will give results else it will download in the backend into the caching server
+user --> ISP caching servers --> torrent
+
+Amazon will create caching servers world wide as they have edge servers across the globe
+
+CDN (continuos delivery network) ---> Cloudfront in AWS ..
+
+Origin --> where original content exist
+Cache --> static content such as css,js,img
+
+Using CF for our project (may be check a YT video)
+
+creating cdn in aws CF and create a r53 record to redirect distribution domain name(from CF) to cdn-domain name
+
+$# invalidations in CF --> when a new content deployment is done , we ask server to remove existing content from cache (if a new content is deployed)
+
+
+

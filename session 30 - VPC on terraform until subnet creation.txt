@@ -1,0 +1,61 @@
+create VPC
+create Igw
+associate Igw to VPC
+subnets - public , private , database and associate them to routes
+routes - public , private , database
+Elastic IP - added in NAT gw
+NAT gateway - egress to private 
+
+Terraform naming convention - (would be easy if followed)
+= use _ in code instead of -
+= in ui to see resource names use - instead of _
+= avoid caps 
+= don't repeat resource type in resource name ..like expense-vpc (if you create VPC) use expense
+= don't use plural for resource name like "subnets" instead use subnets
+= include count,for_each inside resource or datasource as first argument after a new line
+= put tags as the last arg followed by depends_on and lifecycle
+=when using conditions , prefer boolean instead of length
+
+
+Now VPC in terraform
+--------------------
+root module : terraform-vpc-root-module
+childe module : vpc-test-child-module
+
+--terraform-vpc-root-module--
+common tags --> for all resources being created here for the project
+resource tags --> for each resource
+
+So , if you want to put type and don't know default value , use below syntax and [don't give default here]
+variable "env" {
+type = string 
+}
+
+if you don't want to give default value and type
+variable "env"{
+default = {}
+}
+
+##TIP - if you change anything on locking (in provider - like changing key name), don
+terraform -init reconfigure
+
+so we do VPC , igw without issues
+
+since subnets are to be created in 2 availability zones - 1a,1b
+
+we create 
+1a - private [10.0.1.0/16] , public [10.0.11.0/16], database [10.0.22.0/16]
+1b - private [10.0.2.0/16] , public [10.0.12.0/16] , database [10.0.22.0/16]
+
+but here ,we need to get availability zone data from aws and then list first 2 for us
+
+after doing local , data ..{see the script to understand}
+
+so we just created subnets with names --now to attach them to internet gateway and nat gateway
+
+additional things
+map_public_ip_on_launch = true #for public subnets
+
+database subnet group creation to put database subnets under one grp
+
+depends_on = [aws_internet_gateway.main] #since NAT gateway won't work without internetgateway

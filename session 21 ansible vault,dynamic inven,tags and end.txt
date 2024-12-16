@@ -1,0 +1,116 @@
+Ansible vault
+---------------------
+ansible-vault create credentials.yaml ##credentials.yaml is file name , cannot be stored in github
+
+ansile-vault edit mysql_creds.yaml create as(in) /var/expense/mysql_creds.yaml
+ansible-vault encrypt mysql_creds.yaml
+
+so , now you can comment vars file in mysql , and in myql.yaml add 
+vars_files: 
+    - /var/expense/mysql_creds.yaml
+
+so here , it takes creds from var/expense/mysql_creds created on server
+
+also , to ask the passwd , use ask_vault_pass= true in ansible.conf file to use vault
+
+and also , sudo access has to be there where this file has to be run or read access to all is required(since passwd is must we can give read access to others too but not share the password)
+
+aws SSM parameter store is used more than ansible-vault (as ansible vault is bit outdated) ###if asked in interview
+---------------------------------------------------------
+
+Ansible Tags
+-------------------
+if there are 100 task on playbook , but we need only 10 tasks to be run ...we can use tags
+
+to filter out easily 
+
+first , we need to determine which tasks needs tags 
+
+ex- if there's version upgrade in app we are using , we need to use tags on 'common' file , like below-
+
+- name: importing tasks from common
+  tags: 
+    - deployment
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: app-pre-req
+
+just use command -
+
+tags:
+  - <name_of_the_tag>
+  
+after giving tags , run ansible-playbook backend.yaml -t deployment
+
+Ansible Dynamic inventory - to fetch instances in run-time
+------------------------------
+inventory.ini --> static file
+
+no.of servers increase when traffic increases --> so we use auto-scaling 
+
+so , we need to have servers get added and removed according to traffic
+
+Ansible should query cloud and get the I.p addresses and add dynamically at that time......
+
+query should have capabilities (we give below info)
+
+- to authenticate
+- to view region
+- to search using name
+- to filter out running instances
+- to check private I.P
+
+use amazon.aws.aws_ec2 plugin to connect to outside servers . so we create a file  'aws_ec2.yaml' (this has to be the name)
+
+so , create 30 ec2 instances  and you want them dynamically in your ansible-inventory , so 
+
+ansible-inventory -i aws_ec2.yaml --graph (--graph to check if it's working by showing list of I.Ps)
+
+
+Now , use dynamic inventory to connect to multiple servers
+----------------------------------------------------------
+
+so ,we need more size for ansible-server instances , like t3.large if we want to connect to 1000 nodes
+
+forks = 5 (by default) but if we want to connect to first 5 and perform and complete tasks on first 5 instances 
+
+if needed more > ansible.cfg > [defaults]
+                                forks= 10 (to connect parallely) --> task level
+								serial= 3 (then , ansible will run playbook on first 3 servers and then next 3 , likewise) -->play level
+								
+								
+To run playbook on ansible server using key
+
+create a key ssh-keygen -f ansible
+
+and store this below ansible.pub key in ansible server
+
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+QyNTUxOQAAACAa1QqKBAoVv5Hk4OBee0I7nw+W0r8/kGOErfcjzEJkUQAAAKBwyi9QcMov
+UAAAAAtzc2gtZWQyNTUxOQAAACAa1QqKBAoVv5Hk4OBee0I7nw+W0r8/kGOErfcjzEJkUQ
+AAAEB8XQvgqf0z9S3zEjEpkW15GD8sfIyTF4wlPkGsw2Sq8xrVCooEChW/keTg4F57Qjuf
+D5bSvz+QY4St9yPMQmRRAAAAG1NhdHlhIE1hY2hhbmlAU2F0eWFfTWFjaGFuaQEC
+-----END OPENSSH PRIVATE KEY-----
+
+once done give path of key in ansible.conf
+
+private_key_file=/home/ec2-user/ansible.pem
+
+and you can run ansible-playbook -i inventory.ini 03-install-nginx.yaml
+
+you can check if nginx is running or not using pub I.P of node using sudo systemctl status nginx
+
+
+---Another thing
+
+ansible is unfit for infra management but only for CM (in a server)
+
+see , if in ec2-create playbook , if you modify the name of an ec2-instance name ..it's not going modify it's name in aws but is going to create a new ec2-instance with that name ...hence it is poor for infra or cloud management and hence we use 
+
+Kubernetes 
+
+
+
+
+

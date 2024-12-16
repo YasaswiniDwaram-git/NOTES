@@ -1,0 +1,60 @@
+session 28
+Modules advantages
+--------------
+code reuse
+updates are centralized
+user can be restricted using few operations (like not being able to create instance other than t2.micro,t2.small,t2.medium by declaring it in variable
+
+variable "instance_type" {
+    default = "t3.micro"
+    type        = string
+    validation {
+        condition     = contains(["t3.micro", "t3.medium", "t3.small"], var.instance_type)
+        error_message = "instance_type can only be one of t3.micro, t3.medium, t3.small"
+    } 
+}
+
+now VPC 
+----------
+virtual private cloud - CLOUD RESOURCES within a cloud account
+
+we have 3 servers 
+
+database --> this should be private and not accessible to internet
+backend --> this should be private and not accessible to internet
+frontend --> this must be accessible to public
+
+we create servers logically inside VPC ...
+to which we use subnetting 
+
+example I.Ps 10.0.1.0/24 ([8bits].[8bits].[8bits].[8bits]/[24bits]) , so it means we can have the last 24 bits used like
+
+10.0.1.0 ......... 10.0.1.225
+10.0.2.0............10.0.2.225
+.						.
+.						.
+.						.
+
+10.0.225.0...........10.0.225.225 and again until 10.225.225.225 ( 2^24 I.Ps)
+subnets - 3 subntes fpr private (private subnet will not have internet connections and are used for internal communications) , public (which has internet connection is called public subnet) and database (this is also private here)
+
+internet gateway  - internet gateway is in between internet and public server , so associate it with VPC and also internet gateway with public subnet using a route table
+
+routes - (create privtae public and database route tables and associate them with respective subnets)
+
+NAT gateway - if DB or backend/private servers want to communicate with public server they use NAT gateway , since these are secure servers and cannot be reached directly ...so we fix an IP address 
+
+Elastic IPs - when instance are stopped and started or terminated I.Ps of servers changes , so we have static IP 
+
+use that and create NAT gateway , again we need to create a route for NAT to private servers (DB and backend)
+so go to routes for private and database routes and edit route select internet from NAT gateway
+
+now we create a VPC with CIDR - 10.0.0.0/16 , here last 16 bits can be used 
+
+So , AWS account >> VPC >> REGION 1 [subnets for DB,Backend,frontend]
+						   REGION 2 [subnets for DB,Backend,frontend
+						   
+						   
+Next class 
+----------------
+we create a module to create a VPC and then call it anytime

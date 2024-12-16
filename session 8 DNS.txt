@@ -1,0 +1,56 @@
+try performing session 7 without errors and then come back here , few commands might be missing in our notes , so check gitpage notes
+
+theory
+-------------------------------
+last session has I.P adresses uploaded in the backend.service script and we can simply use domain name and hence
+
+DNS (DOMAIN NAME SYSTEM)
+--------------------------
+mysalon.com , myvibe.com , mysql.devops.com --> returns an I.P address
+
+domain registrars --> azure , aws, GCP , godaddy, hostinger(cheapest way) etc..
+
+domain name is universally unique
+
+ISP responsible for DNS resolution (providing name to I.P)
+
+scenario--if you access facebook with new PC
+
+browser checks its cache for facebook.com
+browser contacts OS for IP address of facebook.com
+OS checks cache now , but its NA
+
+so now OS is enabled to contact ISP DNS resolver
+
+DNS resolver checks its cache and contacts root servers (Root Servers are 13 in world , but there are replicas for these too)
+
+TLD - TOP LEVEL DOMAINS -->.com .in .gov .edu and more
+
+root server scans for the requested domain (facebook.com) and informs DNS resolver to contact .com TLD Root server
+
+DNS resolver to contacts  TLD Root server to provide I.P address
+
+TLD checks it's system to provide IP address of facebook.come
+
+Records
+------------------------------
+just buying a domain won't do much ...deep dive on Records,
+
+A record --> you have to update IP to your domain
+
+.satya I should contact root servers that I started a TLD called .satya
+
+Domain registars are middle man. now I connect all major domain registars to show my domain TLD
+
+Domain registars inform TLD that some one bought facebook.satya domain
+
+Domain registars update nameservers for the domain from TLD....
+
+DNS resolver connects with TLD address... address is nothing but nameservers
+
+--------------------------
+
+Frontend and backend proxy (next class)
+
+
+Couldn't understand the theory but view the diagrams for it but practical is DONE

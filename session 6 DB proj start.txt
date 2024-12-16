@@ -1,0 +1,73 @@
+project
+---------------------
+Desktop and web based applications (web apps is preferred more when compared to desktop)
+
+resemble working of restaurant to working of a web application (how request works)
+
+person showing tabel(captain) 
+chef
+waiter
+
+captain-->waiter(takes order)--->chef(turns raw materials to food)
+
+captain(load_balancer)-->waiter(webserver)-->chef(appserver)(turns data to result)
+
+if a request is made by an user
+
+user-->load_balancer-->webserver(includes mobile apps too)-->appserver-->database server
+
+response 
+
+web tier/frontend tier(LB, web server) --> HTML , CSS, JavaScript , ReactJS , Angular, ExpressJS, Jquery ..
+app/API tier/backend tier(app server) --> Java,Python,NodeJS , DotNet , Go ..
+data tier(database servers) --> MySQL , MSSQL,Orcale,Postgress,MongoDB , Redis ..
+
+static - frontend applications --> are run on web servers nginx,apache 
+Dynamic - backend applications --> are run on application servers such asJBoss, Webspher 
+
+------------------------------
+task1.
+
+create an ec2 instance to act as database server using (redhat - devops-practice community AMI and allow all in SG)
+
+connect to ec2 using  
+ssh ec2-user@pub_I.P 
+
+username - ec2-user
+password - DevOps321
+
+task2.
+
+install DB and run the DB server(we use MySQL)
+
+dnf install mysql-server -y  -->install  ##mysql is actual server and mysql is command-line client that allows users to interact with server##
+
+systemctl start mysqld -->run DB
+
+check status and if sql port is enabled (i.e., 3306) --> netstat -lptn
+
+to check if sql process is running  --> ps -ef | grep mysql
+
+now enable mysqld --> systemctl enable mysqld
+
+change default root passwd of DB server --> mysql_secure_installation --set-root-pass ExpenseApp@1 (#ExpenseApp@1 is password)
+
+Here , server software is mysql-server , to check data we need to connect to server
+
+install mysql client packages --> dnf install mysql -y
+
+mysql -h<IP> -u root -p<password> (I.P is needed when client is outside server , but here both client and mysql server in same server) , so
+
+just 'mysql' command is enough  (if it does not allow use -->mysql -u root -p<password> , here mysql -u root -pExpenseApp@1)
+
+----------------
+in SQL there are schemas and tables
+
+database servers>>>shcemas/database>>tables
+
+schemas contains tables
+
+show databases;
+use <data-bases>;
+select * from <tablename>
+

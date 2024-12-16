@@ -1,0 +1,83 @@
+Recap of Terraform until now
+-----------------------------
+IaC advantages
+variables
+locals --> to store expressions , can also include variables
+conditions -->
+data types
+loops --> count spl variable [count.index] used for list , 
+for each loop --> used to iterate map , will give spl variable "each"
+functions
+outputs --> to use output of one resource as input of other tf task
+data sources --> query existing info from provider 
+state --> statetf is used to compare actual infra and declared infra
+remote state --> to avoid duplicacy and errors while working in collaborative environment
+locking --> to make sure infra is not being distrurbed by others while running it
+tfvars --> to overwrite default variables
+
+
+Expense project (now using for each loop)
+-----------------
+mysql --> t3.micro
+backend --> t2.micro
+frontend --> t2.micro
+
+there's one more kind of loop called Dynamic loop
+
+ingress and egress are known as blocks (they are not defined by = )
+
+we can put the block in a loop and then iterate that as well which is called Dynamic block
+
+Provisioners
+--------------------
+
+To prepare servers for service , making the servers ready , they take actions locally (where terraform is executed) or remotely(like doing on jenkins server)
+types -- local and remote
+LOCAL
+-------
+#here the PC is local so local-exec , else remote-exec
+  provisioner "local-exec" {
+    command = "echo ${self.private_ip}" > public_ip.txt
+  }
+
+#what the above command is doing here is , redirecting output from command to a file in local
+
+#here self indicates the resource to which we are adding the provisioners in this case , to an ec2 resource
+
+REMOTE
+-------
+#here , we first connect to the remote server so we use connection block
+resource "aws_instance" "web" {
+  # ...
+
+  # Establishes connection to be used by all
+  # generic remote provisioners (i.e. file/remote-exec)
+  connection {
+    type     = "ssh"
+    user     = "root"
+    password = var.root_password
+    host     = self.public_ip
+  }
+  
+
+  provisioner "remote-exec" {
+    inline = [
+			   "sudo dnf install ansible -y ",
+               "sudo dnf install nginx -y ",
+               "sudo systemctl start nginx",
+			]
+  }
+
+DESTROY TIME PROVISIONERS
+--------------------
+provisioner "remote-exec" {
+    when = destroy
+    inline = [
+      "sudo systemctl stop nginx",
+    ]
+  }
+  
+here , inline action is performed when we do terraform destroy 
+
+Module development
+---------------------

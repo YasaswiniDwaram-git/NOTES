@@ -1,0 +1,78 @@
+functions ==filters
+--------------------
+we can't write custom functions in ansible , since ansible is developed in python we need to write code in py to get the functionality required
+(mostly this won't happen since we use most from ansible functions)
+
+filter --> manipulation
+
+ - name: convert maps to list
+      vars:
+        data:
+          name: "chinnu"
+          age: 24
+          location: "satya's heart"
+      ansible.builtin.debug:
+        msg: "{{ data | dict2items }}"
+       
+gives the below list as output---
+
+ "msg": [
+        {
+            "key": "name",
+            "value": "chinnu"
+        },
+        {
+            "key": "age",
+            "value": 24
+        },
+        {
+            "key": "location",
+            "value": "satya's heart"
+        }
+    ]
+
+now , we check vice versa
+
+fatal: [localhost]: FAILED! => {"msg": "Failed to import the required Python library (netaddr) on ip-172-31-81-11.ec2.internal's Python /usr/bin/python3. Please read the module documentation and install it in the appropriate location. If the required library is installed, but Ansible is using the wrong Python interpreter, please consult the documentation on ansible_python_interpreter"}
+
+for this error , it says we don't have latest python libraries installed so
+
+check which version are needed using ansible --version
+
+and pip3.9 install netaddr
+
+if modules not in ansible , we use
+
+ansible.builtin.command
+ansible.builtin.shell
+
+command vs shell ##interview 
+--------------------
+commands --> for simple commands , this will not get the shell environment
+shell --> complex ones like pipes ,redirectories tec ,, this will get shell environment
+
+command is secure than shell , since the command will not go into sever but shell does
+
+expense project
+------------------
+3 servers
+3 records mysql
+
+welcomepage.yashd.icu  -->public I.P to give to users
+backend.yashd.icu   -->private I.P
+mysql.yashd.icu   -->private I.P
+frontend.yashd.icu  -->private I.P
+
+ansible not only used as CM tool , but can connect to any system is module is available
+
+ansible --> AWS python library to create ec2-servers and interact
+
+Console ,API , CLI , SDK(software development kit , for python - boto3 and botocore)  --> to interact with AWS
+
+to create instance for aws using ansible
+-----
+in ansible documentation , check - ansible ec2 creation
+
+in ansible server 
+
+aws configure --> to access the account using key

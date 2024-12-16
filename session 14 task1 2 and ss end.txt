@@ -1,0 +1,62 @@
+with linux , we write shell script since shell is native there (like ppl in a state speaking their language)
+
+but python -->gets data from external systems
+
+crontab (for intervewis)##
+--------------
+schedule the script run periodically instead of running them manually - daily/hourly/minutely/weekend scripts etc
+crontab.guru (to know the sytanx for multiple examples)
+	  
+*     *      *            *           *
+min  hour  day(month)   month    day (week) 
+
+command to run crontab is crontab -e (will open a file )
+
+ * * * * * sh /home/ec2-user/Gitrepo/delete-log-files.sh (to run crontab for every min CMD(ruuning script or any command )
+ 
+ backup
+ -----------
+ we will zip files from sourc dir and send to destination directory in zip
+ 
+ we write script to mv few days of logs from source to destination directory
+ 
+ we need user to give ,
+ 
+ source directory details  , check if there are not (if not exist exit script , giving message "dir not found")
+ destination directory , check if there are not (if not exist exit script , giving message "dir not found")
+ if both are there , ask num of days - (if no input take default as 14 days old)
+ zip them , move to destination directory and delete ones from source directory
+ 
+ script check in VScode- backup.sh
+ 
+ create folders
+ 
+ 
+/home/ec2-user/app-logs
+
+
+/home/ec2-user/backup-folder
+
+backup created
+----------------
+now we try to make script as command for this backup operation
+
+so , first give execution permission for all to this script
+chmod +x backup.sh
+and copy to /bin where we have all linux commands , so this can be used as native command
+sudo cp backup.sh /bin/backup
+
+so now you can just give backup (backup.sh will act as a command)
+
+task2.
+---------------------------------
+check HD memory and if usage is > 75% , send a mail to user
+
+df -hT | grep xfs | awk -F " " '{print $nF}' #to give nth framgment after space
+(first see HD and then list xfs type and then to just see mem consumption
+
+
+assignmanets - complete on sunday
+--------
+read file and count numbers in each word / print top 5 occurances(done almost ig)
+reverse rows as column and column as rows (:)

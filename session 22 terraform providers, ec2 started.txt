@@ -1,0 +1,118 @@
+
+Recap - 3 tier achitecture , using linux (all manual) , shell script (via scripting) , ansible (tasks ,plays and roles)
+
+Terraform --> IaaC infrastructure as code
+------------------------------------------
+and we can create EC2, IAM and R 53 using this
+
+Manual infrastructure creation can lead to human errors
+--------------------------------------------------
+if any changes made by mistake , application will be down...
+to look for changes and the rectify the change will take time until then app would be down which is loss for business
+
+we could not achieve the app to back to it's original state easily , but IaC can all the below things too
+
+Version control ,
+Consistenant Infra (to create same env cofigs and infra) , 
+CRUD infra , 
+inventory/resource management --> seeing code we can determine which resources present without accessing server/cloud account
+cost optimisation --> easy creation and deletion saving time and manual effort
+dependency management --> create sg before ec2 instance , such cases are easy in terraform
+code reuse --> DRY , roles , modules on terraform too
+
+Terraform is declarative way of creating infra ---> giving orders to terraform to create infra using right syntax
+it is a HCL --> Hashicorp configuration language
+
+it has easy syntax
+no sequence required on tasks
+state management -->  it can check what's already created and update it accordingly
+
+Infra is foundation for any APP , 
+
+put downloaded terraform in a folder in a drive (E drive)
+
+open "edit the system environment variables" in PC and select Environment variables and then select path , add the path of folder where terraform.exe is downloaded
+
+We can run terraform directly from windows and then push on Git
+
+using AWS configure , we connect PC and aws account too
+so , we install AWS command line
+
+script from vscode will be pushed by terraform to AWS using AWS CLI
+
+Terraform --> we can connect to any cloud platform like aws,azure,GCP ,oracle,alibaba and to GitHub , can be used for networking etc
+.these are all providers
+------------- 
+variables
+datatypes
+conditions
+loops
+functions
+   it's data sources from
+		locals
+		outputs
+		providers
+		provisioners
+		
+		
+Task1.
+----------
+create a terraform repo in git and clone it to vscode
+
+terraform extenstion is '.tf'
+
+'provider.tf' file should be there in each folder where tf files are there... to give provider config (since we use AWS , we give)  (can be found in google)
+
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "5.76.0"
+    }
+  }
+}
+
+provider "aws" {
+  # Configuration options
+}
+		
+in Configuration options , we can give our aws configure details but since we are pushing this to git , we won't give
+
+syntax
+
+resource "resource-type" "name-of-the-resource" {
+		key = value
+}
+
+To create SG , we use name , ingress , egress (these are mandatory) but description is not
+
+we allow evrything in egress (this is outgoing traffic)
+we allow specific in ingress (this is incoming traffic)
+
+-----------
+terraform init--> do this evrytime you launch terraform in a folder (to download terraform for provider)
+
+For sure put .gitingore in the folder (for git to ignore terraform)##
+
+-->terraform plan --> this will read your code and will tell what is being done if we do 'terraform apply'
+
+if you make any changes to existing code and then do terraform plan , it says changes are being overwritten instead of creating new 
+
+terraform apply -auto-approve (this is like -y in linux)
+
+Task2.
+-------------------
+create ec2 instance , required info is
+
+name
+ami
+sg-id
+keypair
+instance type
+
+to remove all infra
+------------
+terraform destroy 
+it will delete one by one based on dependencies , first destroys instance and then SG
+
+so no matter the sequence you use in script , terraform knows the priorities and dependencies

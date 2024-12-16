@@ -1,0 +1,87 @@
+package management
+------------------------
+yum or dnf
+
+cd /etc/yum.repos.dnf --> to view kernel or repo info  i guess
+
+yum install <?!> to install
+
+yum/dnf list installed --> to view installed packages 
+
+dnf list available  --> to view packages available to install
+
+dnf remove git -y <to remove git>
+
+how to check  (since proc is in root directory) (to go to root directory use cd /)
+ cpu info --> cat /proc/cpuinfo
+, memory info --> cat /proc/meminfo
+, os that is used --> cat /etc/os-release
+
+service management
+---------------------------------------
+
+start , stop , restart , status check , enable , disable (same name as command) (systemctl start/stop/restart/status/enable/disable )
+
+systemctl status/start/stop sshd ( for status check )(this sshd is for ssh service)
+systemctl enable nginx
+systemctl disable nginx
+systemctl restart nginx
+
+http://ipaddress:80
+
+process management
+-----------------------------------
+every process has an ID - PID
+every process has parent process - PPID
+
+to check process running --> ps -ef (here ps - processstatus , e - all , f-full format listing)
+
+ps -ef | grep nginx
+
+- if anyone ask if website is not responding  then check "systemctl status <ngnix or shh or smthng>" should be active
+then ps -ef | grep <ngnix or shh or smthng> to check if running
+
+FG -foreground ( runs in FG, so we can't perform anything on screen)
+
+BG-background (runs in BG)
+
+ex - sleep 100 (FG) (can't do/run anything for 100 sec on screen)
+ex - sleep 100 & ('&' is to put process in BG ,process ID is shown )
+
+top --> command to view monitor system performance and resource usage (to get out ctrl+C)
+
+to kill process --> kill <PID> (request)
+kill -9 <PID>  --> to force stop (order)
+
+Network Management
+----------------------------
+
+netstat --> command to view network statistics
+
+netstat -ltpn --> (l - to show listening sockets (actively waiting for connection) , t - to see TCP connections , p - to see program using sockets ,
+                   n - numerical address of port)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

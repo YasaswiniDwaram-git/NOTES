@@ -1,0 +1,98 @@
+
+
+we create 3 servers right , each server with it's own SG and SG rules
+
+Mysql 
+backend  
+frontend 
+
+here we create 3 SG using our SG module
+
+Mysql 
+backend  
+frontend 
+
+
+Do terraform init , everytime you add a module
+
+create sg rules
+-----------------
+We created just egress on sg module , so we add rules for ingress now...
+
+1.MySQL SG --> will allow connections from instances which has backend SG attached on port range - 3306
+2.frontend  --> will accept connection from public (0.0.0.0/0) on port 80 (80 for Web browsers, external users)
+3.backend SG --> will allow connections from instances which has frontend SG attached on port - 8080 (8080 used for dev and prod ,internal users )
+
+UNTIL NOW - created 3 SGs , created rules between SGs to allow each other as required
+
+NOW ==>
+
+we have to have instances to be connected to the SGs too and usually they are connected via ssh (port 22)
+
+since we can't connect to them from HOME , we use 
+
+1.Bastion
+2.VPN
+
+BASTION is -
+Deployed in a public subnet of a VPC.
+Configured with a public IP for access over the internet.
+
+--then we can configure SSH or RDP  secure access to a private network in a VPC from external source such as internet 
+*create a bastion resource (we do this using ec2 module from terraform instead of our own module)
+module "ec2_instance" {
+  source  = "terraform-aws-modules/ec2-instance/aws" (this source is from github of official tf , so use direct as mentioned in usage of the readme.MD file
+*create a SG to attach it to bastion
+*create SG rules for mysql,database and frontend(even though we can connect to frontend as it has public but to make the connection secure we have bastion connecting to frontend)on port 22
+
+Open Source and Custom modules (diff)
+----------------------------------
+while creating bastion ec2 , we use SG created for bastion which is store in SSM parameters
+
+since we have SGs is SG folder , we push the parameters from there by applying , so we can use them to create the  EC2 instances for bastion,frontend,backend and aws
+
+Below is for assiging public subnets to bastion
+-------------------------------------
+resource "aws_ssm_parameter" "public_subnet_IDs" {
+  name  = "/${var.project_name}/${var.environment}/public_subnet_IDs"
+  type  = "StringList" #we habe 2 subnets , so it is a list ["subnet1" , "subnet2"] , we convert this into subnet1 ,subnet2 using join and removes comma to join subnets 
+  value = join( ",", module.vpc.public_subnet_IDs)
+}
+
+Now to use the SSM parameters in ec2 , we convert string to list by using and select first subnet [0]
+
+public_subnet_IDs = split(",",data.aws_ssm_parameter.private_subnet_IDs.value)[0]
+
+like way create bastion ec2 instance and then our apps (ec2 istance for backend,frontend,database)
+
+Now , we create an ansible server in pub subnet and also an SG for it (we can use the bastion ec2 only if required but doing seperate ec2)
+
+We need ansible to connect to frontend,backend and database instances on port 22(since ansible works on SSH protocol)
+
+so we create sg rules for ansible to connect to frontend,backend and database instances on port 22
+
+First we create all these and the we create ansible server too
+
+We need an inventory.ini for ansible to connect to servers
+
+since ansible can connect to servers on private i.p , create r53 records
+
+Now , we try to install ansible and also directly try to deploy the apps too to run it when it is started(like user data while launching instance)
+
+We write a script for that and add
+
+user_data = file(expense.sh)
+
+in order for us to check , we need ansible to access internet too
+
+mysql_backend 3306here "_ refers to from" and the number is port
+backend_frontend 8080
+frontend_public 80
+mysql_bastion 22
+backend_bastion 22
+frontend_bastion 22
+mysql_ansible 22
+backend_ansible 22
+frontend_ansible 22
+ansible_public 22
+bastion_public 22

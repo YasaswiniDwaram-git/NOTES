@@ -1,0 +1,82 @@
+now , we write script for backend server installation
+
+so , we check idempotency whenevr we run the script , so run part of it twice and check if output is changed.
+
+check expense folder > mysql and backend files script
+
+To create a directory 
+
+mkdir /app --> if ran again , will show as failed as that directory already exists
+
+so mkdir -p /app --> if not there , it creates , it's there skips
+
+
+deployment or new version release
+----------------------------------
+plan the downtime
+first stop server
+back up previous version
+remove existing version
+download new version
+start server
+
+since system user cannot perform user actions like vim,we run a script to list vim actions too
+
+most explanation is in code , check incase of confusion
+
+-----------run code and it worked for all
+
+HTTP methods and HTTP status codes
+-------------------------------------
+CRUD
+
+GET --> read data from DB
+POST --> create data , we should send data ..which usually goes to json
+PUT --> update existing info
+DELETE --> delete
+
+2** --> 200,201 , 204 -->success
+4** --> 400 starting client side error
+5** --> server side issue
+3** --> redirecting 
+frontend us client for backend -->frontend --> 404 data not found
+check in google 
+
+ /var/log/messages (backend logs stored here)
+
+-----
+we use validate function for every step , so instead we can use set -e (to exit when error is received)
+but if code is too long , we can't determine where in script the code got exited , so again we need to print echo to know if it is a success or not
+
+so , better use validate
+
+Deleting old logs using shell script
+-------------------------------------
+
+delete .log files older than 14 days
+
+mkdir logs
+cd logs
+create few logs by setting date --> touch -d 20241006 log1.log --> and create more same way with diff dates and with diff .js , .java , .py 
+
+find all .log files --> *.log/messages
+
+find . -name "*.log" --> gives .log files names in current directory
+
+ find . -name "*.log" -mtime +14  --> gives .log files in cuurent directory older than 14 days
+ 
+  find . -name "*.log" -mtime +14 -exec ls -lrt {} \;
+  
+algorithm,
+
+-in which directory files (ask input)
+-does that direc exists
+-find files
+-delete them
+
+to read output or file , we use while loop
+
+while(condition)
+do
+done
+

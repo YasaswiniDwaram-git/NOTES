@@ -1,0 +1,61 @@
+session 31
+
+REVISE one more time on how VPC and all explnataion to get clear idea
+
+VPC creation resume from route tables , routes, route_table_association
+
+video until 18:00 on (session -31)
+
+routes creation , route table creation
+
+So , watched VPC video according toit ,
+
+1.create VPC
+2.Create internetgateway and attach it to VPC
+3. create subnets and associate them with VPC
+4. create route tables
+5.Associate route tables to subnets 
+6. Now for public route table , associate the internetgateway from routes
+7.create EIP
+8.Create NAT gateway in public subnet and add EIP to it
+9.Add NAT gateway to the routes in private and database subnets
+10.Create subnet grp by adding (we'll have DB subnets here from 1a and 1b AZs)
+
+VPC Peering
+------------
+This is to have private connection between to VPCs (in same account or not)
+
+1.create peering from your VPC to the one required
+
+we want to share communication from the subnets -pub and private (not database) to the default VPC, so 
+
+Add the default VPC CIDR in pub and private route table (use default VPC CIDR and select peering as type)
+
+Now , default VPC also has it's own igw and route table 
+
+---------So , we add our own VPC CIDR in default VPC route table (route) by giving the CIDR and type as 
+
+
+Resources to be created until now -
+
+aws_vpc
+aws_internet_gateway
+aws_subnet (public , private and database 1 in each zone 1a,1b --tot 6 subnets)
+aws_db_subnet_group (we'll have DB subnets here from 1a and 1b AZs)
+aws_eip
+aws_nat_gateway
+aws_route_table (pub, private and database)
+aws_route (pub , private and database)-associate private and database with NAT & pub with IGW
+aws_route_table_association (associate subnets with routetables)
+
+WE DO PEERING IN TERRAFORM NOW
+-----------------------------
+
+first , we need to ask if peering required or not so create a variable to ask
+
+then we create
+
+aws_vpc_peering_connection
+aws_route --> we add route from our VPC to default VPC and vice versa
+
+put readme.MD file accordingly with variables (optional and mandatory ) , outputs

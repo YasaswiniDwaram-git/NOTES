@@ -1,0 +1,53 @@
+session 35
+--------------
+
+The Project infrastructure will not change frequently (like a basement/foundation to house) - contains
+VPC
+SG (SG will not change while rules may change)
+Bastion 
+DB (RDS) 
+Load balancer (rules and TG may change but LB not required to change)
+
+Application infra will change when required (like rooms of house which can be remodelled) - contains
+EC2 instances
+Target groups
+
+so here we configure 2 	LB 
+frontend and backend
+bastion will be connected to all instances 
+
+So , SGs required while configuring 
+
+frontendLB_public : 80
+frontendserver_frontendLB:80 (frontendLB accepting request from frontendserver on port 80)
+backendLB_frontendserver : 80 (this is not internet facing but for LB we can use port 80)
+backendserver_backendLB:8080
+RDS_backendserver : 3306
+frontendserver_bastion : 22,80 (we don't connect frontendLB to bastion , since it is public facing and trouble shooting can be done
+backendLB_bastion : 80 (since for LB port 22 access is not given by AWS)
+RDS_bastion : 3306,22
+bastion_public : 22
+
+2 ways to create records
+Hostpath 
+-----------
+we direct app-dev.yashd.icu --> backendLB (application LB that works on layer 7)
+		  web-dev.yashd.icu --> frontendLB
+		  
+		  
+Context path
+--------------
+yashd.icu/app-dev
+yashd.icu/web-dev
+
+Now , we create LB for 
+
+backend --> app_alb
+frontend --> web_alb
+
+
+WE configure Load balancer in such a way that when request hits LB on
+
+app-dev.yashd.icu --> default response
+backend.app-dev.yashd.icu -- > redirect to backend TG 
+bedyifyu.app-dev.yashd.icu --> not valid to go to backend TG

@@ -1,0 +1,28 @@
+Top to bottom approach
+-----------------------
+what is the problem? - manual infra
+How terraform can solve? -- IaaC
+Apply
+ 
+to create infra (resources) in providers
+
+	 auth
+Iaac ---- API(provider.tf) -----> Providers
+
+advantage - faster releases , less defects
+				
+To be able to create infra-
+1. we need to know how aws service/resource works
+2. we need to give inputs/arguments
+3. providers will give the output
+4.We can create more resources using the output too
+				
+				
+Data sources
+-----------------------
+
+AMI ID changes whenever there's an updated , so we need to make sure the updated AMI id is updated on the code too
+
+Can be achieved using querying existing info from providers which is possible to data source
+
+so , we need GET API which can be done 

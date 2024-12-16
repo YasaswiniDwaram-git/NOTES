@@ -1,0 +1,207 @@
+project started
+
+task1.
+
+-create 2 instances , database and backend server using AMI 
+
+-connect to database server using gitbash (in session 6)
+ backend server using putty (open putty in session name - give session1 or sthng (we don't use I.P as it is dynamic and keeps changing 
+							 connection>data>give username 'ec2-user'
+							 appearance (if required can be changed)) and SAVE to save the session 
+- to connect to ec2 instance just go to session and give I.P address of backend server
+
+or if we want to open tabs of terminals like in chrome
+
+download superputty and add putty location to it , once done 
+		in superputty--> give i.p address in hostname and hit enter to have the instances connected
+		
+theory..
+
+backend --> java,python, NodeJs , go , ruby , php
+
+[[[we use 'libraries' since we can't code from scratch and they are free 
+
+for NodeJs
+-----------------
+build file ==package.json --> this is where you mention project metadata such as-
+Name , description , version , dependencies and their versions.
+
+build tool = npm --> it will search package.json in your folder and will get dependencies/libraries from internet
+
+source file --> *.js
+
+for Java
+---------
+build file == pom.xml --> Name , description , version , dependencies and their versions.
+
+build tool = maven --> it will search pom.xml in your folder and will get dependencies/libraries from internet
+
+source file --> *.java
+
+for python
+--------------
+build file== requirements.txt --> Name , description , version , dependencies and their versions.
+
+build tool = pip --> it will search pom.xml in your folder and will get dependencies/libraries from internet]]]
+
+source file --> *.py
+
+task2.
+
+#install nodejs on backend server using
+
+sudo su -
+
+dnf module list nodejs --> to list all nodejs modules
+dnf module enable nodejs:18 -y --> here 18 is module that is not required , so disable
+
+dnf module enable nodejs:20 -y (to install versio 20 , as default is 17)
+
+#adding system user 
+useradd <systemusername>
+
+now creating a directory to store application naming as /app--->mkdir /app
+
+curl -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip ---> 
+
+here ,,curl -o (output of curl) is being stored as backend.zip file in tmp folder
+
+now cd /app and unzip /tmp/backend.zip 
+
+npm install (will check if package.json is present and then download packages required from internet and store it in node_modules folder)
+
+To summarize
+----------
+build file  --> package.json
+build tool	--> npm (node package manager)
+files		--> *.js
+
+task3..
+along with theory
+
+usually , we use systemctl to start a service , so if you want to a service and want to start/stop/enable using systemctl command
+
+we edit the services directory in ---> vim /etc/systemd/system
+
+and create the service file (extension should be .service)
+
+so vim /etc/systemd/system/backend.service ---> to create backend.service and insert below command (just replace <MYSQL-SERVER-IPADDRESS> with DB private I.P)
+
+[Unit]
+Description = Backend Service
+
+[Service]
+User=expense
+Environment=DB_HOST="<MYSQL-SERVER-IPADDRESS>"
+ExecStart=/bin/node /app/index.js
+SyslogIdentifier=backend
+
+[Install]
+WantedBy=multi-user.target
+
+use private I.P if communication is to be within a network , if outside use public I.P
+
+Since we are using both in same project , we use private I.P but pub I.P can be used
+
+(pub I.P will change if you stop/start server , but private I.P won't)
+
+systemctl daemon-reload--> to reload services (if new are added etc)
+
+systemctl start&enable backend , and also check status -->systemctl status backend
+
+if failed ,check logs
+
+/var/log/messages --> where all the logs are present , so to view give command
+
+less /var/log/messages  (ctrl+C to go back)
+
+task4..
+
+previous task was failed as we have no expense schema in DB server , so we create one and try establishing the backend service again
+
+get the schema from cd app/ | cat schema/backend.sql
+
+
+CREATE DATABASE IF NOT EXISTS transactions;
+USE transactions;
+
+CREATE TABLE IF NOT EXISTS transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    amount INT,
+    description VARCHAR(255)
+);
+
+CREATE USER IF NOT EXISTS 'expense'@'%' IDENTIFIED BY 'ExpenseApp@1';
+GRANT ALL ON transactions.* TO 'expense'@'%';
+FLUSH PRIVILEGES;
+
+task4.
+
+loading shcema to database using mysql client
+
+dnf install mysql -y (either on backend or db server ..doing it on backend server)
+
+mysql -h <MYSQL-SERVER-IPADDRESS> -uroot -pExpenseApp@1 < /app/schema/backend.sql  ---> to load shcema on client server 
+
+<MYSQL-SERVER-IPADDRESS> - database private I.P which we are using
+
+mysql -h 172.31.47.193 -uroot -pExpenseApp@1 < /app/schema/backend.sql  ---> to load shcema on client server 
+
+now you can see in database server the schema "transactions"and tables in it -->mysql
+
+you can see in backend server the schema "transactions"and tables in it using --->mysql -h <MYSQL-SERVER-IPADDRESS> -uroot -pExpenseApp@1
+
+now restart service backend
+
+systemctl restart backend
+
+netstat -lptn (mostly backend will use 8080 as port)
+
+now check if backend can access database 
+
+ping 172.31.47.193
+
+telnet 172.31.47.193 3306 (to check if port 3306(sql) is running on I.P)
+
+task4..
+
+create an ec2 instance as frontend server (use t3 as t2 micro was showing errors)
+
+sudo su -
+dnf install ngnix -y --> to run frontend application on ngnix
+
+/etc/nginx -->nginx config is here
+/usr/share/nginx/html --> need to place websites here (when you give I.P in chrome , it will load whatever is present in this location)
+/car/log/nginx --> here nginx logs are stored
+
+we need to have our website in /usr/share/nginx/html , so to force remove that content
+
+rm -rf /usr/share/nginx/html/*
+
+now save developers code for website in temp directory (go to home directory using cd and then below command)
+
+curl -o /tmp/frontend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-frontend-v2.zip
+
+go to /usr/share/nginx/html using , cd /usr/share/nginx/html
+
+and unzip the code here unzip /tmp/frontend.zip
+
+since we need to have app(backend) server on the web(app) server (like we did database server on backend server)
+
+so , vim /etc/nginx/default.d/expense.conf
+
+proxy_http_version 1.1;
+
+location /api/ { proxy_pass http://localhost:8080/; } (in place of localhost , we place private I.P of backend server)
+
+location /health {
+  stub_status on;
+  access_log off;
+}
+ 
+ now you can open expense app using pub I.P of frontend server
+ 
+ when app is down , do systemctl restart <servicename>
+ and check ports netstat -ltpn if listening or not (since port 80 for loading app check 80 is there or not) 
+ 
+

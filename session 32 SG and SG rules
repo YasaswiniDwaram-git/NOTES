@@ -1,0 +1,44 @@
+ 
+
+Since we pushed all to Git , we will take source from git to use the module
+
+After changing source from local to git module ,terraform init -reconfigure 
+
+Now we create AWS security grp for MYSQL server in aws using terraform
+Name - expense-dev-mysql (project-env-server_name)
+
+1.create a root module for SG 
+2.use this module source for SG (just like you used for VPC)
+
+###If you get same error even after doing init , Run terraform get -update to make sure the module dependencies are refreshed.
+
+done with SG creation too...
+
+you might add more and more resources and the state refresh will be done every time you plan and apply ..
+
+it takes more time and also more API requests to aws from terraform...
+
+so create resources on diff folders (which act as diff repos) (since this is small project we can just create a simgle folder and have sub folders of below )
+expense-infra-dev (main folder)
+
+1.VPC 
+2.SG
+3.mysql server
+4.backend server
+5.frontend server
+
+To have a sequence , give numbers like 10-vpc , 20-sg , 30-mysql etc ...if any resource need to be added it can be done in the middle
+
+WE need vpc_id to create SG , so since vpc module in diff repo can't be called right?
+
+AWS systems manager Parameter Store (to store values or parameters in aws and can be used from data)
+------------------
+here you can save values of specific resources to use them later on creating more resources
+
+create one using terraform and then store the vpc_id in SSM(parameters.tf)
+name should be like - /expense/dev/vpc_id  (projectname - env - valuename)
+
+Now you  have 
+
+1.VPC 
+2.SG

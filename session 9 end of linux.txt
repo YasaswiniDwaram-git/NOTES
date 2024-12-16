@@ -1,0 +1,158 @@
+Records
+-------------
+A --> directs to I.P address
+CNAME --> directs to another domain
+MX --> mail services
+NS --> Nameservers
+SOA -->Authorization
+TXT -->Validation purpose
+
+Forward and reverse proxy
+--------------------------------
+A forward proxy--------------- is a server that sits between client devices (like computers or mobile devices) and the internet.
+forwarding requests from clients to the internet and returning responses back to the clients 
+-enhance privacy
+-control access
+-cache data
+-monitor traffic
+
+Example - VPN (can access geo restricted info , client side proxy since only client is aware that it's proxy by hiding client identity)
+office laptops in office environment ( to restrict access to websites)
+
+Reverse proxy----------------is a server that sits in front of one or more backend servers and forwards client requests to those servers.
+ a reverse proxy represents the backend servers to the client.
+-Load Balancing
+-Cache
+-Enhanced security
+ 
+Example - content delivary network(CDN), when user access website ,he can only see frontend as backend server identity is hidden
+load balancers , client does not know to which server their request is going to.
+
+task1.
+
+create 3 instances (see how load balancing is working)
+-install nginx in all 3
+
+/etc/nginx/nginx.conf -->nginx default config is here
+/usr/share/nginx/html --> need to place websites here (when you give I.P in chrome , it will load whatever is present in this location)
+/car/log/nginx --> here nginx logs are stored
+server-1                              server-2
+---------                           --------------
+-cd /usr/share/nginx/html | rm rf *   cd /usr/share/nginx/html | rm rf *
+-vim index.html                       vim index.html
+<h1>server1</h1>                      <h1>server2</h1>
+
+If you need to change anything on nginx modify at etc/nginx/nginx.conf 
+###you can also do cat etc/nginx/nginx.conf to see the ports that nginx listens to and shows config details (default is 80)
+
+if you want to add any other configuration without disturbing the default, then
+
+/etc/nginx/default.d/*.config
+ in chrom look for nginx load balancing upstream and it results below
+
+http {
+    upstream backend {
+        server backend1.example.com weight=5;
+        server backend2.example.com;
+        server 192.0.0.1 backup;
+    }
+}
+
+--------------------------------
+vim /etc/nginx/nginx.conf in nginx server and in http
+
+    upstream backend {
+        server 52.90.62.237;
+        server 34.229.113.179;
+    }
+	
+-cd /etc/nginx/default.d
+-vim load-balancer.conf and out proxy code from front end
+
+proxy_http_version 1.1;
+
+location /api/ { proxy_pass http://localhost:8080/; }
+
+location /health {
+  stub_status on;
+  access_log off;
+}
+-----------------------------------
+Here backend is the config we created  when we do this ..persons trying to reach to backend will trigger I.Ps present in those
+proxy_http_version 1.1;
+
+location / { proxy_pass http://backend/; }
+
+location /health {
+  stub_status on;
+  access_log off;
+ 
+}
+
+Linux and it's directories
+------------------------------------------
+
+/ --> root directory of the OS
+/bin(binaries) --> essential commands such as ls, cat, grep, etc.
+/sbin(system binaries) --> admin commands, reboot, iptables, etc.
+/boot --> when linux server started, it refers boot directory for system configuration (like in windows you want something to run as soon as system starts)
+/dev(devices) --> monitor/terminal, keyboard, printers, etc.
+/etc(extra configuration) --> system configuration files, service configurations, etc.
+/home(home directory of users) --> all users directory are here, their personal files, user related configs..
+/lib(Libraries) --> libraries/dependencies required by OS equal to .dll in windows
+/lib64(64 bit libs)
+/media(Media devices) --> CD, DVC, USB, etc.
+/mnt(mount) --> adding extra disks
+/opt(optional) --> if you want third party applications, custom applications you can keep here
+/proc(processor) --> /proc/cpuinfo /proc/meminfo
+/root (Root user) --> home directory of root user
+/run (Running information of server)
+/srv(service files) --> When you use your server to serve as file server, you can use this
+/swap(Swap space) --> 1GM ram, OS will use this swap space for extension of RAM. Reserver space
+/sys --> system kernal info, devices info, etc
+/tmp --> temporary directory, not at all important
+/usr --> shared files and docs between all users...
+/var(variables) --> logs and messages
+
+free -m --> check ram usage
+df -hT --> HD usage
+du <filename> --> to know mem usage of single file
+du --> to know for whole directory
+
+Configuration is what we had done until now , to list out the tasks
+1.Install application runtime --> java, nodejs 
+2.create user
+3.create a folder
+4.download code
+5. install packages
+6.create systemctl services etc..
+
+Shell scripiting is like putting all commands in a file and running that file  
+
+SHELL SCRIPTING
+---------------------
+Shell is a interpreter in linux that checks and executes the user commands
+
+/bin/bash --> interprets every command issues inside linux server  (since bin has all the commands)
+
+diff between doing one by one command and shell scripting is
+
+if any error occurs doing a command , we clear that out and proceed ..so fine
+but when you run through the program it has to check if previous command is success or not , if success proceed else inform user(is called error handling)
+
+Algorithm
+-------------
+nothing but listing out steps , ex- install a packages on server--
+
+to do that check root access   -if no root access, show error  (uid will be '0'when 'id' command is used ,for root access)
+if root access , proceed next step
+
+check if already installed or not --if yes , inform already installed 
+if not installed, proceed next step 
+
+store scripts and programs in ---> Git (next class)
+
+tac to view reverse order in file (reverse to cat)
+
+
+

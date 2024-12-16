@@ -1,0 +1,54 @@
+loops
+--------
+for i=0;i>100;i++{
+
+print i;
+}
+
+here it checks the value and reiterates until the loop stops
+
+it prints 1 2 3 4 ...99 (since 100>100 is false , loop stops there)
+
+in shell scripting,
+
+for i in 1..10
+do
+	echo i   #here do and done are like start and end brackets where you give a work
+done
+
+even after the script is run , if we need to check if it's failed or success 
+we need to view logs , we use redirects for that
+
+ex: ls -l > output.txt --> redirects only success output
+
+1--> success
+2--> error
+
+ls -l 2> output.txt --> redirects only error output
+
+ls -l &> output.txt --> redirects all the output
+
+if you do cat output.txt , then info is repalces if just '>' is used , so to add/append use '>>'
+
+all logs will be at /var/log/messages ,
+
+so we create a log folder in shell script
+
+LOGS_FOLDER="/var/log/shell-scriptings"
+SCRIPT_NAME=$(echo $0 | cut -d "." -f1) --> $0 gives scriptname hello.sh , since we just need file name , we cut the text from '.' and list -f1(fragment 1) which is the file name 'hello')
+TIME_STAMP=$(date +%Y-%m-%d-%H-%M-%S) --> to view date and timr
+LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME-$TIME_STAMP.log" --->since this is where logs are stored to read easily
+
+ran successfully , after tiny mistakes --
+
+Since user can't always go and check logs from log file , we show imp messages on terminal after execution of script
+
+for that , tee -a --> writes logs to multiple destinations including on term (-a is for append)
+
+now , install mysql using script in terminal
+
+Idempotency
+-------------------
+if same script is ran again infinite, it should not alter the output
+
+so CRUD

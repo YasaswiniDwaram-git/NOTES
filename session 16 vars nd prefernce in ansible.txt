@@ -1,0 +1,35 @@
+Ansible playbook
+---------------------
+ansible-playbook -i inventory.ini -e ansible_user=ec2-user -e ansible_password=DevOps321 01.ping.yaml
+
+just give 2 spaces after the task
+
+vars:
+    NAME: "Yash"
+    age: "24"
+    location: "hyd"
+	
+	tasks:
+   - name: print the data
+     ansible.builtin.debug: 
+       msg: "Hi , I am {{NAME}} and {{age}} yr young and at {{location}} now" --> to declare variables {{}}
+	   
+damn with spaces in ansible
+
+better not to change anything from source file , so instead of that we can put vars in a file and then use that file name on script to use all vars
+
+play level vars
+task level vars
+vars from files
+vars from prompt
+vars from inventory
+variables from inventory (passing arg)
+
+1st preferecne is args/command line
+2nd preference is for TASK level
+3rd preferecne is from files
+4th preferecne is from prompt
+5th preferecne is from PLAY level
+6th preferecne is from inventory
+
+ansible-playbook -vvv -i inventory.ini -e ansible_user=ec2-user -e ansible_password=DevOps321 01.ping.yaml ( so , -vvv will debug command )

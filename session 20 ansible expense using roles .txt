@@ -1,0 +1,74 @@
+Ansible roles
+-----------------
+proper structure of playbook that includes variables, files, templates , other dependecies , handlers etc ..roles can be reused
+
+ tasks/ ---> you can keep list of tasks that the role provides to the play for execution
+ handlers/ --> when there is change in particular task , you can notify other task
+ templates/ --> you can keep all your files with variables
+ files/ --> you can keep all your files without variables
+ vars/ --> you can keep all your variables
+ defualts/ --> low priority variables
+ meta/ --> other dependecies
+ library/ --> you can keep custom modules created using python here
+ module_utils/ --> roles can also include custom module_utils
+ lookup_plugins/ -->other types of plugins, like lookup in this case
+ 
+ansible.config
+---------------
+when ansible --version
+
+you'll see "config file = /etc/ansible/ansible.cfg"
+
+4 ways to load config
+
+
+ANSIBLE_CONFIG (environment variable if set)
+
+ansible.cfg (in the current directory) (better option to customize according to repo)
+
+~/.ansible.cfg (in the home directory)
+
+/etc/ansible/ansible.cfg
+
+for backend.service file saving ...we use backend.service.j2 
+
+jinja2 ---> templating language
+---------------------------------
+
+Handlers/Notifiers
+-------------------------
+
+when a task is changed , we want to notify another task
+
+when a task is not changed , no need to notify
+
+ex - after updating config , we have to restart ...so we can make it to notify if config is changed
+
+-------------------------------------------
+
+now we are using 3 modules - 1mysql , 1nodejs , 1nginx
+
+if we need 12 moduels - 4 java , 4 python , 4 nodejs
+
+we can use the common code and just
+
+1. remove existing app/directory
+2. create new app/directory
+3. download code
+4. extract code 
+
+since /app(backend app service) , /usr/share/nginx/html(frontend app service)
+
+Ansible tower is UI based , so in interview we can say we are using CLI
+
+Ansible galaxy (not much used)
+
+Milestone
+-------------
+completed expense project ( configuration of servers)
+using ansible and then using ansible roles (common can be more useful to use roles anywhere) ##check ansible-expense-roles
+
+cloud migration (moving from onpremise to cloud)
+
+multiple tests on data sync from onprem to cloud  , downloading and deploy 
+also cloud migration works for RDS (in DB)

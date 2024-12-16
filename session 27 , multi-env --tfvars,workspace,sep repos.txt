@@ -1,0 +1,118 @@
+Terraform main adv is it can offer consistent infra on all env
+--------------------------------------------------
+1.tfvars 
+2. terraform workspaces
+3. seperate repos
+
+-----------------------------------
+tfvars
+-------------------------------------
+
+resource definition will be same
+
+argument : value 
+
+in any case there is possibility that we change value but not the arguments when creating diff env,so
+
+we create a repo , to have multiple envs
+
+since tfvars is used to overwrite existing variables , we can use tfvars and reuse the same code
+dev.tfvars --> to be used for dev env
+prod.tfvars --> to be used for prod env
+
+can be done in 2 ways using s3 nd dynamoDB
+
+a single bucket and diff keys
+diff buckets and diff keys (this option is ideal as to avoid altering anything from prod)
+
+so , we create expense project resources
+
+3 ec2 , 3 r53 records in diff env and same code
+
+so , we'll create evrything in prod and also dev
+
+ec2-instances names - mysql-dev/prod
+					  backend-dev/prod
+					  frontend-dev/prod
+r53 records - mysql-dev.yashd.icu      mysql-prod.yashd.icu
+			  backend-dev.yashd.icu    backend-prod.yashd.icu
+			  frontend-dev.yashd.icu   yashd.icu (since we use this for website page)
+			  
+terraform init -backend-config=dev/backend.tf
+ (to initialize and point it to dev file)
+ 
+ then,  terraform plan -var-file=dev/dev.tfvars (we are suggesting terraform to search variables at dev.tfvars for dev)
+
+	  
+terraform init -reconfigure -backend-config=prod/backend.tf
+ (to reconfigure and initialize and point it to prod file)
+ 
+ you have to keep reconfigure if you want change from dev to prod and viceversa
+ 
+even to plan and destroy you have to reconfigure
+
+-----------------------------
+Terraform workspaces
+------------------
+
+create a folder for workspaces and then to create a workspace -
+
+you use , terraform workspace new <workspace_name> (in our case dev/prod)
+
+if you want to delete a workspace , for switch to default and then delete the one you need
+
+terraform workspace select default (this is command to switch to default)
+
+--create a variables file and 
+
+variable "instance_type" {
+ default = {
+    dev = "t2.micro"
+    prod = "t3.micro"
+ }
+}
+
+bcause in workspace 
+-----------
+we need ec2 instance ,
+in dev "t2.micro"
+in prod "t3.micro"
+
+instance_type = lookup(var.instance_type , terraform.workspace) ##this command will check in which workspace you are and then will check in  vars the associated instance_type and creates that accordingly
+
+if you are in prod workspace , then terraform.workspace== prod and based on that we take values
+
+Advantages in both approaches (better to be familiar if client requests)
+--------------
+--> code reuse
+disadvantages
+------------
+--> not much easy to implement and more errors might occur if missed any
+--> if any change in common code , it effects all envs
+
+-------------------------
+seperate code/ repo
+----------------------------
+expense-infra-dev
+
+expense-infra-prod
+
+disadvantages is just having duplicate env (coz if complex infra , so better use seperate 
+
+Module development
+-----------------------
+DRY by using 
+-->roles , variables , functions
+
+Modules -> resource definition and args are same but values are diff
+
+module "ec2" {
+    source = "../terraform-aws-ec2"
+}
+
+here when you run the file , it will search for "terraform-aws-ec2" file and uses its script..if you specifically want few changes 
+
+module "ec2" {
+    source = "../terraform-aws-ec2"
+	instance_type = "t2.large" ##specify here
+}

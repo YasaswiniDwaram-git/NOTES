@@ -1,0 +1,89 @@
+more on inventory---
+
+ungrouped -
+
+172.31.83.159
+172.31.83.102
+172.31.83.158
+
+grouped -
+
+[backend]
+172.31.83.159
+172.31.83.102
+172.31.83.158
+
+group of grouped -
+
+[servers:expense]
+web
+backend
+mysql
+
+[all:vars] #same vars will be for all servers in an inventory
+ansible_user=ec2-user
+ansible_password=DevOps321
+
+ansible -i inventory ungrouped/all/<group_name> --list-hosts --> to list hosts from inventory file
+
+data types
+--------------
+int , float , double , decimal , long , etc -->number
+boolean -->true/false
+list
+map
+
+
+Ansible is developed using python
+
+hosts: web --> target IP under web group
+
+[ --> list
+{ --> map
+
+expense project start
+--------------------------
+create expense user --
+check if already there are not'
+if yes , dont create
+if not , create
+
+id expense --> exit status 0 then , dont create else create
+
+ansible does not have modules for everything , so we can use direct commands like in linux server by using
+
+ansible.builtin.command: id expense
+
+Error handling in ansible
+---------------------------
+ignore_errors: True --> to tell ansible to ignore the errors as it wil exit if a error pops unlike shell scripting
+
+"msg": "user info:{'changed': True,
+'stdout': 'uid=1002(expense) gid=1002(expense) groups=1002(expense)', ---> output from id expense after the user is created
+'stderr': '', 
+'rc': 0, --> exit status
+'cmd': ['id', 'expense'], 
+'start': '2024-11-14 05:47:15.610592', 
+'end': '2024-11-14 05:47:15.617808', 
+'delta': '0:00:00.007216', 'msg': '',
+'stdout_lines': ['uid=1002(expense) gid=1002(expense) groups=1002(expense)'],
+'stderr_lines': [], 'failed': False}"
+
+Gathering facts in ansible--
+
+it takes all the info of the server under the hosts , so it can take decision based on that info
+
+if we want to install nginx and don't know underlying OS
+
+we use ansible.builtin.package where if OS is redhat it runs ansible.builtin.dnf , if ubuntu ansible.builtin.apt
+
+after ruuning gather facts --> we see whole big json INCLUDING the OS info
+
+"os_family": "RedHat",
+        "pkg_mgr": "dnf",
+		
+if module is not present , the we gather facts and then write playbook based on those
+
+loops
+-------------
+reserved key word - item

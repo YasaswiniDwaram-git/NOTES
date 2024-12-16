@@ -1,0 +1,65 @@
+CDN (only be available in US-east-1)
+---
+this is used to reduce latency for customers 
+
+origin can be --> s3, ALB,API gateway , any existing URL etc
+
+Cache --> static content such as css,js,img
+
+invalidations in CF --> when a new content deployment is done , we ask server to remove existing content from cache (if a new content is deployed
+
+Cache order
+---------------
+/images/* --> here whatever is present after images from the URL expense.cdn.yashd.icu/images/* --it will be cached
+/static/* --> here whatever is present after static from the URL expense.cdn.yashd.icu/static/* --it will be cached
+
+default cache(which ever we don't want to cache) -->  expense.cdn.yashd.icu ..this is dynamic content--> choose disabledcache option and after creation 
+edit behaviour (Origin request policy  to None)
+add behaviour for /images/* , don't add put and post for caching , just get,head,options and select cachingoptimized for policy (Origin request policy  to None)
+add behaviour for /static/* , don't add put and post for caching , just get,head,options and select cachingoptimized for policy (Origin request policy  to None)
+
+Here CF will see if any are enabled for caching and if not there it will treat as dynamic and no cache is enabled for rest
+
+invalidations--> creating this will make server to pull content from server directly by rmeoving cache stored
+
+Now , we create this using terraform
+---------------------------------------
+"aws_cloudfront_distribution"
+	-origin
+		-domain_name
+		-origin_id
+		-custom_origin_config
+			-http_port
+			-https_port
+			-origin_protocol_policy
+			-origin_ssl_protocol (from console , this can be choosen)
+	-enabled
+	-aliased = ["expense-cdn"]
+	-default_cache_behavious #this we edit according to dynamic (no cache)
+		-many are there , check tf resource
+		-viewer_protocol_policy
+		-cahce_policy_id (this has to be pulled through data , Managed-cachingdisabled)(we use id)
+	-ordered_cache_behaviour (this is for static and images),cache policy id differs here , this also will be pulled through data ,Managed-cachingOptimized) create 2
+	-tags
+	-viewer certificate
+		-acm_certificate_arn
+		-ssl_support_method
+		-minimum_protocol_version
+		
+module "records" and edit accordingly like handson was done on creating record
+
+
+https://expense-dev.yashd.icu/static/media/3TierArch.0486e7150e53d305d1c2.png
+	
+above is the application URL , so here you have /static  as path pattern, so create a behaviour /static/* 
+you can also have multiple options (/css/* , /js/* , /images/* ,/api/* )
+
+To destroy all in one folder from last to first 
+------------------------------------------------
+for i in $(ls -dr */) ; do echo ${i%/}; cd  ${i%/} ; terraform destroy -auto-approve ; cd .. ; done
+
+To create all in one folder from first to last
+-----------------------------------------------
+for i in $(ls -d */) ; do echo ${i%/}; cd  ${i%/} ; terraform apply -auto-approve ; cd .. ; done
+
+ISSUE WITH CLOUDFRONT , CDN is not loading , even with script and with manual

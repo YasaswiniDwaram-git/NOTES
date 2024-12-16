@@ -1,0 +1,130 @@
+Legacy
+---------------
+old technology
+
+if anyone ask any challenge faced , we say we are managing our legacy systems since grafana cannot be used for monitoring
+to add those few servers
+so we use shell scripting to 1.store logs and scedule them (using crontab)and to 2.send alerts on monitoring CPU and memory
+
+Configuration management (CM)
+--------------------------------
+server --> when created it is plain so we configure it to manage or monitor or serve application  --> manual , shell script
+disadvantages of ss
+---------------------------
+since shell script is not idempotent by default --> we write custom code to make it idempotent
+error handling is not precise--> we need to write code and check it
+it is homogenous --> redhat script won't work in ubuntu , only works for specific distribution
+if too many servers --> not scalable to follow in too many servers
+syntax --> not easy to understand
+
+CM tools --> puppet, chef, ansible, rundeck etc.
+
+push & pull
+-----------------
+when we take its pull (like checking notifications using after logging into an app), when we get its push (like push notifications)
+
+disadvantages of pull
+-------------------------
+causes more traffic/ requests 
+more bandwidth
+more consumption of power for server 
+more consumption of power for our phone/client
+
+Ansible uses push configuration hence more advantageous
+
+we can say , we moved to ansible from legacy servers for CM (in interview)
+
+Ansible architecture
+----------------------------
+ansible server uses SSH protocol
+
+184.72.79.250 --> to createa a file login
+
+ssh ec2-user@184.72.79.250 -C "echo 'Helloworld' > /tmp/helloyou.txt" (from gitbash , directly connect to server(of I.P) and '-C' execute command "echo 'Helloworld' > /tmp/helloyou.txt"
+
+now , when checked in server by connecting the file will appear
+
+so , same is done by ansible (based on SSH protocol)
+
+CM --> node/box 1, node 2 (here the servers node 1 and 2 will pull by checking for new config(if it;s there or not) in CM )  used 90% of cases
+Ansible --> node 1 , node 2 (here ansible server/master server pushes config to nodes) used 10% cases ##ansible have both pull and push based config now
+
+now connetting ansible server to node
+
+ssh username@nodeI.P
+
+1st check , is ansible server able to reach node? --> check firewall config etc
+
+to connect using ansible --> ansible -i 34.207.140.229, all -e ansible_user=ec2-user -e ansible_password=DevOps321 -m ping
+-i inventory has all nodes connected to a ansible server
+-m module (nothing but command)
+
+if response is ping:pong , then it responded
+
+-------
+now we install nginx on node from ansible
+dnf        install   nginx -y
+cmd/module  options  input
+
+ansible -i 34.207.140.229, all -e ansible_user=ec2-user -e ansible_password=DevOps321 -m ping -m dnf -a "name=nginx state=installed"
+
+above command has to be passed by root used , so
+
+ansible -i 34.207.140.229, all -e ansible_user=ec2-user -e ansible_password=DevOps321 -b -m ping -m dnf -a "name=nginx state=installed"
+
+-b --> become root
+-a -->arguments
+
+adhoc commands --> command issued from ansible server targeting ansible node manually , usually for some emergency
+
+running commands one by one in sequence --> shell scripting
+
+keeping all list commands/modules to be run with some syntax and run all at once --> playbook #####imp
+
+it is run on yaml--> yet another markup language (like xml , json)
+
+DTO --> data transfer objects
+
+XML------------ signup page info
+<Signup>
+	<Name>satyashu</Name>
+	<Email>satyashu@gmail.com</Email>
+</Signup>
+
+json------------- (comments will not work in json)
+
+{
+	"Name": "satyashu",
+	"Email": "satyashu@gmail.com"
+}
+ "amount_spent"
+[                                          ##[] denotes list
+	{
+	"amount": 200,
+	"description": "food"
+	},
+	{
+	"amount": 100,
+	"description": "movies"
+	}
+]
+yaml-------------------- (check spacing)
+Name: satyashu
+Email: satyashu@gmail.com
+
+controlM team to get jobs done (which uses crontab )
+
+
+Milestone:1 ---> 3 tier architecture manual design using linux servers as frontend, backend,database
+advantages - got clear idea on what has to be done and what's going on in the 3 tier architecture,learning linux commands
+challenges- issue on managing I.Ps for using server as LB
+errors - managing permissions of users and files
+final take-  Got clear picture but will practice more to aviod forgetting
+
+Milestone:2 ---> same arch but using shell script##
+advantages- more idea on scripting , 
+challenges- easy when familiar on manual provisioning , determining function and to know where to call , had to follow everystep exactly
+			have to work more on logic and algorithm based on usecase
+errors-  mostly due to syntax errors and due to mistyping linux commands
+final take- remember commands and rum more logics
+

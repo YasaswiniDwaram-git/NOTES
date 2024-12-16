@@ -1,0 +1,83 @@
+now , we create expense project
+
+3 instances 
+
+how to customize below option ??
+
+expense1 folder on vscode
+
+mysql --> t3.micro
+backend --> t2.micro
+frontend --> t2.micro 
+
+so instance_type = var.instance_names[count.index] == "mysql" ? "t3.micro" : "t2.micro"
+
+Now R53 records (see expense1)
+
+##terraform fmt -------> this will format code (beautify)
+---------------
+Locals
+--------------------
+locals are like variables , but has extra capabilities where we can store expressions and intermediate values when ran in terraform will get values , locals can use variables in it 
+
+variables can be overriden but  not locals
+
+###count.index will not work in locals , so we need to assign them to variables
+
+STATE, REMOTE STATE & LOCKING
+----------------------------------
+Terraform will check if the existing infrastructure matches the configuration we require , when we terraform apply -- Terraform checks the state 
+which is terraform.tfstate = here it stores whatever it has created and checks the existing config and required config 
+
+suppose you ran a file and created ec2-instances using terraform
+-------------------------------------------------------------
+now if you try to run again
+
+actual infra(existing infra) == declared infra (required infra)
+
+so it says "No changes. Your infrastructure matches the configuration "
+
+now if a resource is mistakenly deleted from console and check
+
+terraform.tfstate ---> this shows instance is created
+actual infra ---> this shows resource is absent(since delete)
+config files --> this says to create the infra
+
+so , how will terraform find if the resource is missing??!!
+
+terraforms refreshes the terraform.tfstate against actual infra and gives when we plan
+
+Note: Objects have changed outside of Terraform ,it even mentiones the deleted/altered resource details and changes it again if we run apply
+
+Remote State
+-----------------
+If multiple persons are creating infra , it may create duplicacy or errors..since terraform can't check other person's terraform.tfstate file
+
+so , while working in collaboration env , we keep the state in remote location , so terraform can effectively compare the actual infra
+
+LOCKING
+------------------
+.lock ---> programms will check if any .lock file is there and will not allow other usrs to edit while performing an execution
+
+after running terraform init , this .lock will be avaiable locally (in our PCs)
+
+But for locking in remote state , we use s3 bucket for ( remote storage ) 
+nd Dynamo DB(for locking) ---> create a table and partition key - "LockID" 
+ 
+remote_state_locking(DB table)
+aws-remote-locking (bucket)
+
+Now configure these in provider , we add below piece of code so terraform won't create any state.tf files locally but will store in remote state
+
+terraform {
+  backend "s3" {
+    bucket = "aws-remote-locking"
+    key    = "remote-state-demo"
+    region = "us-east-1"
+    dynamodb_table = "remote_state_locking"
+  }
+}
+
+so after running terraform apply , we can download the state.tf(created with key as name) file from s3 bucket
+
+Usually tf files are run on jenkins to have files and all

@@ -1,0 +1,97 @@
+Session 4
+
+Administration in Linux
+----------------------------------------
+
+sudo su --> super user login (# shows that you are logged as root user)
+sudo su - --> will navigate to home folder of root user , which is /root
+exit --> to exit sudo
+
+useradd <usernmae> --> to create user
+id --> info about currnet usrs
+id <username> --> display user info along with grps he is in
+
+when an user is created , a grp with same user name will be created
+
+user info will be in /etc/passwd , so to view users cat /etc/passwd
+/etc/group -->group info
+
+passwd <username> --> to set passwd for username
+groupadd <groupname>-->create group 
+usermod -g <groupname> <username>--> add user to a group (here usermod to modify user , -g group )
+
+each user has one primary and atleast one secondary group (can have multiple secondary grps)
+
+usermod -aG <secondary-group-name> <username> --> to add user to secondary group ( -a is to append , G is to add user to secondary grp)
+
+gpasswd -d <username> <groupname> --> delete user from grp  
+
+when new person joins org    when person leaves org
+--------------------------   -------------------------
+create his user profile       remove users from group
+create group                  delete the user
+add user to the group
+
+userdel <username> ---> delete user
+
+groupdel <groupname> --> delete group
+
+while deleting user add user to primary group and then delete user , so the group and user both will be deleted
+
+else if you try to remove user when he is member in secondary group , then user cannot be removed from primary group
+
+task -1
+
+created user 'satya' and set passwd
+login as satya using new window , ssh <username>@ip
+
+linux will not allow passwd auth for users by default, only key based auth is allowed
+
+so , we need to edit config file (in root ec2-user) to allow passauth and the command is
+
+vim /etc/ssh/sshd_config --> to edit config file and gives yes for passwordauthentication
+
+systemctl restart sshd --> to restart
+
+task 2
+
+if you want to continue key based auth then user will create a key
+
+in user terminal --> ssh-keygen -f <username>
+cat <username>.pub 
+
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEZv3SrVZWKonUf2QKPY4Ix4OIBE3Ap1Y4/6YQZ38/Jm yasaswini.dwaram@HDC2-L-W075WVT
+
+
+ and provide it to admin (key is usually stored in .ssh directory in user folder )
+
+
+so admin will go to that user directory --> cd <username>
+ and --> mkdir .ssh(if it is not present then create) and 
+touch authorized_keys --> to update the public key of new user
+
+<usernmae> should have 700 on .ssh and 600 on authorized_keys 
+
+go to satya folder , chown 700 .ssh and cd .ssh and chown 600 authorized_keys 
+
+also name the folder as user(satya) chown -R satya:satya .ssh ( to give folder owner and grp name as ramesh , so only ramesh grp members have access)
+
+to make sudo changes effective use --> sudo systemctl restart sshd command
+
+in user terminal --> ssh -i <keyname> <username>@I.P
+
+once done remove user from secondary grps first and then you can delete user 
+
+
+
+
+
+
+
+
+
+
+
+
+
+

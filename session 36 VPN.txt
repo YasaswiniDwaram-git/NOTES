@@ -1,0 +1,92 @@
+session 36
+-------------
+Usually , when we try to connect to backend server (anything which are not in public subnet or has public access)
+we are using bastion , so if we want to connect from other laptop r smthg , we require VPN
+we create a VPN in public subnet and create rules for VPN to LB , servers to access them
+
+From now , we can use VPN instead of Bastion
+
+VPN usually done by citrix team
+
+
+
+To do list  -
+ VPN SG , VPN SG rules
+ create key pair for VPN
+ VPN instance with Open VPN (ami)
+ connect as "openvpnas" username
+ configure with default options to get admin and client UI (also create username and passwd)
+ download openvpn connect and use client URL with vpn creds
+ 
+Step1.
+creating ec2 with ami -- (since the VPN is already installed and configured on this image, we launch this and make minor configs)
+OpenVPN Access Server Community Image-fe8020db-5343-4c43-9e65-5ed4a825c931 (edit data according to AMI details)
+Since this is a community AMI , we create public and private key(terraform resource) to create the VPN ec2
+
+#key is already created in .ssh of home folder with openvpn name using ssh-keygen -f openvpn
+resource "aws_key_pair" "openvpn" {
+  key_name   = "openvpn"
+  public_key = file("~/.ssh/openvpn.pub")
+ 
+we create SG for vpn and open ports for backend lb,mysql,and backend server
+
+for backend ALB_VPN -> open 80
+backend servers --> 22 , 8080
+
+also , vpn should have ports 443,943,1194 open on internet (you can use ingress and dynamic loop instead of adding rukes on SG)
+since we are using ec2 instance , we open port 22 along with them
+
+after configuring ec2(VPC) , SG and SG rules
+
+WE COULD NOT USE THE AMI , as it has to be purchased , so below is exact process after configuring VPN(ec2 instance)
+
+we connect to VPN (ec2 ) instance using ssh 
+
+ssh -i ~/.ssh/openvpn openvpnas@public_ip  ## here we use openvpnas is default username 
+
+give , yes and enter to use default settings ..it will ask to create password "Ramesh@72" (caps,num , spl char)
+
+after running as you will get admin UI and client UI
+
+Open Admin UI in browser and login using username and passwd ...
+
+Go to VPN settings
+
+Give Should client internet traffice be routed through VPN? - YES
+
+Have clients use specific DNS servers - YES
+
+primary and secondary DNS as 8.8.8.8 and 8.8.4.4 (DNS for google)
+
+Now openvpn (download), after installation give client URL , give username and passwd and IMPORT , enable it give passwd 
+
+Now your IP will be changed as the pulic IP of VPN 
+
+so , now instead of using bastion , you can use VPN and then ...directly access internal resources such
+
+using anythinhgyiewsfi.app-dev.yashd.icu
+
+Now , BACKEND (server)
+----------------------
+Approach 1
+-----------
+Create ec2 instance
+confugure with backend
+we usually do it with ansible , but if there's a new version ..we connect all instances and run the playbook using ansible..
+in this process...stops server
+				  remove old code
+				  download new code
+				  restart server
+
+This approach has downtime and also traffic is increased during down time 
+
+Approach 2
+----------
+Create ec2 instance
+confugure with backend
+stop the instance
+take AMI
+launch it using autoscaling
+
+when traffice increases , autoscaling will take care of adding instances using AMI
+

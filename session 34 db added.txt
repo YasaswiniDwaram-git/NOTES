@@ -1,0 +1,56 @@
+Stateful vs Stateless (which has state(data) vs which doesnot)
+
+Database --> stateful , as it keeps track of data (has to be backed up in regularly and restore and replicate
+			to avoid any loss of data at any point of time)
+backend --> will not store data , so stateless (can be restored safely if any crash , min data lost)
+
+DB (stateful application)
+---------------------------
+An use case is - DB1 is connected to application , DB2 is not -->but the data from DB1 is replicated to DB2
+
+Managing stateful application require more than the stateless , we require below
+1.storage increment
+2.load balancing
+
+RDS
+---------
+Amazon RDS makes it easy to set up, operate, and scale a relational database in the cloud.(instead of using ec2 instance and managing DB , updates on DB all , seperate service to maintain DB)
+
+SOOOOOOOO, until previous session we created instance to maintain DB 
+1.creating VPC
+2.creating SG and SG rules
+3.creating ec2 instance for db,backend,frontned,bastion,ansible
+4.configuring ansible server using ansible and 
+5.Finally checking that it's working
+
+Innnnnnnnnnn , this session --> we already have
+1.VPC
+2.SG (we modify this according to lb,rds services)
+3.loadbalancer
+4.RDS and more...
+
+Hands-on
+----------
+create resources from VPC , SG
+create DB to know the options and then delete, (choose free tier), ExpenseApp1
+Additional configuration-->Database options
+Encryption -->Enable encryption(not chargeable)
+Maintenance -->Auto minor version upgrade Info -->Enable auto minor version upgrade (if any minor upgrade on mysql like 8.0.36 --> 8.0.39 but not 8.0.36 to 8.12 or to 8.9)
+Now , create a DB in tf using db module
+
+skip_final_snapshot = true (this will avoid attaching final snapshot to VPC , if it is attached we can't delete VPC)
+manage_master_user_password = false
+password = "ExpenseApp1"
+also 
+
+we have to target expense.cdgqyayw6fjq.us-east-1.rds.amazonaws.com to mysql.yashd.icu
+
+
+LOAD BALANCER (on aws console) , create 2 nginx servers
+
+we create a load balancer
+target group --> that includes the instances which required load balancing
+Health checks --> LB sends requests to the path of our urlby sending requests to test the health (see Advanced health check settings) , give port 80 (since nginx)
+Create load balancer --> listener will be the target group that we created
+
+"""Ensure that AZ selecting on load balancer has the AZ where instances is created"""

@@ -1,0 +1,118 @@
+
+Variables
+conditions
+datatypes
+loops
+functions in terraform
+
+Variables
+----------------
+Variable is a container that holds value
+
+data types are
+
+strings
+number
+map
+list
+boolean
+set
+object
+tuple
+
+Tagging strategy
+-----------------------
+project > component/Module > env
+
+see ec2.tf in variables in terraform in vscode
+
+terraform.tf vars
+------------------
+using this file , we can over-write default values in variables and also can set
+
+terraform.tf vars and default values --> terraform.tf vars overwrites (for this you create a file named terraform.tfvars and just give
+ 
+key = "value"
+
+more than that , first preference goes to CLI commands so for that you can do terraform plan -var="key=value"
+if you want to use tfvars file , terraform plan -var-file="vars.tfvars"
+
+
+1.command line (terraform plan -var="key=value")
+2.terraform.tfvars (one in files)
+3.enviroment variables (export TF_VAR_key=value) ##here to remove this you can use unset TF_VAR_key
+4.default (ones on script vars file)
+
+if it's given nowhere , it will ask you after doing terraform plan for key_
+
+35:13 on session23
+
+conditions
+-------------------
+(usual syntax)
+if (expression){
+    run if condition is true
+}
+else{
+ run if condition is false
+}
+
+terraform syntax
+-----------------
+expression ? "run if condition is true" : "run if condition is false"
+
+
+There will be outputs after creating resources , so to collect them we use terraform outputs
+
+create a file outputs.tf and you can give syntax
+
+output "output_name"{
+ value = aws_resource.aws_resource_name.output_required(such as public_ip)
+ description = "This is the pub IP of instance created"
+}
+
+loops
+---------------
+1.count based loop
+
+count.index -->(this is a special variable)
+
+tags = {
+    Name = var.instance_names[count.index] ##here count.index will search for "instance_names" and will use the  values from the list
+  }
+
+2.for/for each loop
+
+
+Functions
+-----------------
+
+terraform console ---> this will take you to terraform console like in mysql
+
+join
+-----
+join ("*" , ["potti" , "loves" , "chinnu"])
+"potti*loves*chinnu"
+> join ("" , "satya" , "ashu")
+
+split the same way 
+------
+trim ("ydcushellohsi" , "ydcushsi")
+
+merge
+----------
+merges 2 lists
+
+list-1 --> name=hi , content= greeting
+list-2 --> name = hello , content = greeting , why = simply
+list-3 --> name = time , content = current time 
+merge(list-1,list-2,list-3)
+here output will be name = time , content = current time , why = simply ##it considers last values and overwrites 
+
+Expense project
+------------------------
+3 ece2 , 3 r53 records 
+
+mysql.yashd.icu
+backend.yashd.icu
+frontend.yashd.icu

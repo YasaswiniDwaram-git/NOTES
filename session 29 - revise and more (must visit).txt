@@ -1,0 +1,67 @@
+What is Terraform ?
+Infrastructure as code tool..
+
+why is IaC required?
+-automate,code reuse , version controlling
+
+who introduced terraform into market?
+-hashicorp
+
+- hcl is syntax for terraform (hashicorp language)
+
+what's hashicorp language ?
+it's a declarative language , whatever is asked it will create
+
+concepts - datasource , provisioners ,locals , variables , local-exec , remote-exec , functions , variables ,resources,
+state (remote and locking ) , loops (for each , dynamic , count), tfvars , workspaces , conditions ..
+
+diff between locals and variables ?
+
+locals can have expressions inside them and can evaluate ,and can also have variables inside them but variables can't
+
+count based loop can't be used inside locals (index.count)
+
+commands on terraform-
+terraform init 
+	- terraform reconfigure 
+	-backend-config=dev/dev
+	-upgrade (this updates  version of the module source code) (#will be created during init module.json - will have all details of module)
+terraform plan
+terraform plan -var-file=dev/dev
+terraform workspace new <workspace_name>
+terraform taint <resource_name> --> using this you could taint a terraform resource i.e.,this informs Terraform that a particular object has become degraded or damaged...after taint ..tf plan will tries to replace tainted resource
+terraform destroy
+terraform fmt
+terraform validate ---> validates code and shows errors (if any) like terraform plan
+but diff is validate just checks syntax and validates code  but plan will validate and also show the plan of source_code(what it is going to create)
+terraform state show --> it will show all resources that are created in tf file ..it just shows tfstate file context on terminal 
+
+we might not have access to do terraform apply , so in that case if you want to see it better to save (-out)
+
+
+terraform plan -out plan1.tfplan (this will save the plan in plan1.tfplan (only tf can read this)
+[if you do terraform apply plan1.tfplan , it directly executes the plan without asking for -auto-approve]
+terraform state list --> to avoid all the code and list resources that are created at that moment of time until then
+
+--> for providers better use version = "~>5.0" (usually greater than 5 , so it won't throw error whatever it is)
+
+MORE ON MODULES COZ IMP
+-------------------------
+module "ec2" {
+    source = "../terraform-aws-ec2" {.. means one level up in the directory like cd ..}(we can also give gitrepo where usually the sourcecode is present..then git::<repo_link>)
+}
+
+root module : the actual code (module reffered in source)
+child module : where the root module is consumed  ( which uses the root module) {module.json will be in child module}
+
+
+terraform state:
+-Desired state --delcared infra
+-Current state --currnet infra that terraform is managing
+
+interview question---#####IMP
+----------------------------------
+How to handle a situation when tf state file is corrupted or deleted????
+--we need to import resources that are part of terraform code into its state file which we do using : 
+	terraform import aws_instance.expense <instance_id>  (you take instance id of "expense" from aws account which was created using terraform and using import command , that particular info will be moved into tfstate file)
+

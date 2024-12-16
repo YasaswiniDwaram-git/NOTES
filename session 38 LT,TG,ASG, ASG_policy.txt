@@ -1,0 +1,92 @@
+session -38
+------------
+done the last class until stopping and terminating the instance after taking AMI
+
+now , we do
+6.create launch template by giving --> ami,network, sg etc
+7.create target group
+8.create ASG(auto scaling group) using launch template and place them in TG
+9.create rule in Load balancer
+
+for i in 10-vpc 20-sg 40-rds 50-app-alb 52-vpn; do cd $i ; terraform apply -auto-approve ; cd .. ; done
+
+In backend
+----------
+7.create a target group for app load balancer on 8080 port from VPC and add health check block to have
+																		- interval
+																		-matcher
+																		-healthy_threshold
+																		-path="/health"
+																		-port
+																		-protocol
+																		-tiemout
+																		-unhealthy_threshold
+
+6.create launch template by giving --> ami,network, sg etc
+
+We now create launch template (mostly like choosing options while launching instance) which is required in auto scaling grp
+-we select the AMI created from backend instance
+-private subnet
+-backend sg
+-advance details >shutdown behaviour (should instance stop or shutdown if traffic decreases , we choose terminate)
+
+in terraform aws_launch_template from tf modules and we just put what are needed
+we can remove default options and have below
+	-name
+	-aws_ami_from_instance
+	-instance shutdown behaviour
+	-instance_type
+	-vpc_security_group_ids (backend sg)
+	-update_default_version
+	-tag_specifications
+	
+imp##better not to use this option in prod - if you want to create a specific resource from terraform 
+		--> terraform plan/apply -target=aws_launch_template.backend -auto-approve
+		
+8.create ASG(auto scaling group) using launch template and place them in TG
+
+We create autoscaling grp which requires
+-launch template
+-VPC
+-subnet(private)
+-target_group_arns = []
+-instance_refresh {strategy="Rolling"}
+-no load balancer(as of now not connecting )
+-healthcheck > healthcheck grace period 60 sec
+-desired capacity=min 
+-scaling >min and max
+-Automactic scaling > target tracking scaling policy (to add instances based on  metric)and give all details
+-instance maintanence policy -no 
+next --- next   , create ASG ..if there are 0 instance it will create min no of instances specified
+To check , use I.P (private since it's only there) ip:8080/health if not working connect from super putty and check port 8080 ...
+as checked in ansible , roles, backend,tasks , after use service task , we did not give enabled = true 
+this option is usually used when we want the service to start by itself after configuring...in daemond reload , put
+enabled: true 
+push this onto git again and start creating backend service
+
+Now , in terraform
+aws_autoscaling_group backend (we use launch template here)
+	-name 
+	-max_size
+	-min_size
+	-health_check_grace_periosd
+	-desired_capacity
+	-health_check_type
+	-launch template block 
+			-id
+			-version
+	-vpc_zone_identifier(check in attributes,this asks for subnet)
+	-tags {key=name,value=local.resource_name}[here we need to add multipe tags blocks to declare munltiple tags or use dynamic block]
+	-timeout {delete = "15m"} , this means instance will be deleted if it stays unhealthy for 15 min
+	-tags{key=project,value=expense,}
+	
+aws_autoscaling_policy backend {to set metrics}
+	-name
+	-policy_type
+	-autoscaling_group_name
+	-target tracking scaling policy{metric_specification{metric_type=avgCPUutilization}target_value=70}
+	
+9.create rule in Load balancer (tomorrow) 
+	
+	
+	

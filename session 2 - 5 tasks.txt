@@ -1,0 +1,69 @@
+task 1 
+
+-command to generate ssh key on gitbash
+Go to the folder where u wan to create key using cd , and below command
+
+ssh-keygen -f linux-key #here linux-key can be 'name of the key'
+
+task 2
+create firewall(security grp on aws)
+
+task 3
+launch an aws ec2 instance
+
+task 4 
+
+now connect to ec2 using gitbash using below info
+
+default user name for ec2 user is  ec2-user
+I.P is public IP on instance -3.111.36.134
+protocol is SSH
+connecting using private key generated on gitbash (on task 1)
+
+open gitbash and below command to connect to server(ec2 inst) from client (gitbash terminal)
+
+syntax --> ssh -i <name of the key> <server user name>@<I.P address of the server>
+
+ssh -i linux-key ec2-user@3.109.208.42 #linux-key is private key
+
+then you are connected to the server you created
+
+tASK 5 
+
+practicing linux commands
+
+cd / - root directory
+cd - home directory
+cd .. --> one step back
+ls
+ls -l (list with more info in alphabetic order)
+ls -lr(r is reverse alphabetic)
+ls -lt(latest on top)
+ls -ltr(reverse time , latest at bottom)
+ls -la(a is to show hidden files)
+ls --help(to know all)
+
+
+relative -->  to go to folder2 use cd folder2/ (scenario that you are already in folder1)
+
+ and absolute paths - cd / home/folder1/folder2 (scenario that you are already in folder1)
+
+CRUD (operations in any applications)- create read update delete
+
+create in linux
+
+touch <file-name> -->create file-name
+cat > <file name> --> to add text 
+ctrl +D to exit the file after writing
+cat <file name> --> to read the file
+cat >> <file name> --> append or add the text (since cat > <file nmae> will overwrite the file , we use >> to add to existing context)
+
+mkdir --> to create folder/directory
+
+rm <file name> -->remove in linux
+rmdir <directory name> --> remove directory  (removes only empty directory)
+rm -r <directory name> --> remove directory and files in it
+
+mv <old file name> <new file name> --> to rename
+
+

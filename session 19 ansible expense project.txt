@@ -1,0 +1,16 @@
+continuation of session 18
+-----------------------------------
+1.to connect to mysql server we provide host , username and password (will fail , since it has not been set up)
+2.if already password is already set up we get info
+3.if not set up , module fails
+4.now , we set up by creating root passwd
+
+mysql_secure_installation --set-root-pass ExpenseApp@1
+
+Ansible roles
+-----------------------
+DRY --------> don't repeat yourself
+
+just how we used variables , functions ...we use ansible roles and call them whenever required (have a proper structure in ansible)
+
+view ansible-expense in vscode or in git-repos ...for revision
